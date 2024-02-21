@@ -1,25 +1,16 @@
 package domain
 
-import domain.entity.Account
+import domain.entity.AccountEntity
 import presentation.model.OutputModel
 
-class AuthenticationController {
-    fun registerAdminAccount(name: String, password: String) : Pair<OutputModel, Account?> {
-        TODO()
-    }
+interface AuthenticationController {
+    fun registerAdminAccount(name: String, password: String) : Pair<OutputModel, AccountEntity?>
 
-    fun registerVisitorAccount(name: String, password: String) : Pair<OutputModel, Account?> {
-        TODO()
-    }
+    fun registerVisitorAccount(name: String, password: String) : Pair<OutputModel, AccountEntity?>
 
-    fun LogIntoAdminAccount(name: String, password: String) : Pair<OutputModel, Account?> {
-        TODO()
-    }
+    fun logIntoAdminAccount(name: String, password: String) : Pair<OutputModel, AccountEntity?>
 
-    fun LogIntoVisitorAccount(name: String, password: String) : Pair<OutputModel, Account?> {
-        TODO()
-    }
+    fun logIntoVisitorAccount(name: String, password: String) : Pair<OutputModel, AccountEntity?>
 
-    fun CheckSecurityToken(token: String): Boolean = TODO()
-
+    fun logInAsSuperuser(securityCode: String) : Pair<OutputModel, AccountEntity?>
 }

@@ -1,12 +1,11 @@
-package presentation
+package presentation.menu
 
 import di.DI
-import domain.Authenticator
-import domain.entity.Account
+import domain.entity.AccountEntity
 import domain.entity.AccountType
 
 class MenuFactory {
-    fun getAuthenticationMenu(authenticator: Authenticator<String>): ResponsiveMenu<Account> {
+    fun getAuthenticationMenu(): ResponsiveMenu<AccountEntity> {
         return AuthenticationMenu(DI.authenticationController)
     }
 
