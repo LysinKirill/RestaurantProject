@@ -35,7 +35,7 @@ class ConsoleInputManager : InputManager {
         }
     }
 
-    override fun getFloat(): Float {
+    override fun getDouble(): Double {
         while(true) {
             try {
                 val input = readlnOrNull()
@@ -43,7 +43,7 @@ class ConsoleInputManager : InputManager {
                     println("Could not read a float value from the console. Try again...")
                     continue
                 }
-                return input.toFloat()
+                return input.toDouble()
             } catch(_:Exception) {
                 println("Could not read a float value from the console. Try again...")
             }

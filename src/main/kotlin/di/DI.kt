@@ -2,6 +2,8 @@ package di
 
 import data.AccountDao
 import data.JsonAccountStorage
+import data.JsonMenuStorage
+import data.MenuDao
 import domain.*
 import domain.entity.AccountEntity
 import domain.entity.AccountType
@@ -9,6 +11,7 @@ import java.security.MessageDigest
 
 object DI {
     private const val ACCOUNT_STORAGE_PATH = "src/main/resources/account_storage.json"
+    private const val MENU_STORAGE_PATH = "src/main/resources/menu_storage.json"
     const val SUPERUSER_CODE: String = "SuperUser1337"
     val authenticator: KeyValueAuthenticator<String, String>
         get() = HashAuthenticator(accountDao, hashFunction)
@@ -18,6 +21,9 @@ object DI {
 
     val authenticationController: AuthenticationController
         get() = AuthenticationControllerImpl(accountDao, authenticator)
+
+    val menuController: RestaurantMenuController
+        get() = RestaurantMenuControllerImpl(menuDao)
 
     val superuser: AccountEntity by lazy {
         AccountEntity("Admin", "_", AccountType.Administrator)
@@ -39,5 +45,9 @@ object DI {
 
     private val accountDao: AccountDao by lazy {
         JsonAccountStorage(ACCOUNT_STORAGE_PATH)
+    }
+
+    private val menuDao: MenuDao by lazy {
+        JsonMenuStorage(MENU_STORAGE_PATH)
     }
 }

@@ -16,7 +16,7 @@ fun main() {
             return
         }
 
-        val menu = menuFactory.getMenuForRole(account.accountType)
+        val menu = menuFactory.getMenuForUser(account)
         menu.handleInteractions()
     } catch (ex: Exception) {
         println("Unexpected exception has occurred: ${ex.message}")

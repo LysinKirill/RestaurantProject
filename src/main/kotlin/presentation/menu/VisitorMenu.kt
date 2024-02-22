@@ -1,12 +1,19 @@
 package presentation.menu
 
-class VisitorMenu : Menu {
+import domain.entity.AccountEntity
+
+class VisitorMenu(private val userAccount: AccountEntity) : Menu {
     override fun displayMenu() {
-        println("Sample visitor menu")
+        println("Options:")
+        println(
+            VisitorMenuOption.entries
+                .mapIndexed { index, entry -> "\t${index + 1}. $entry" }
+                .joinToString(separator = "\n")
+        )
     }
 
     override fun handleInteractions() {
+        displayMenu()
         println("Handling interactions (visitor)...")
     }
-
 }

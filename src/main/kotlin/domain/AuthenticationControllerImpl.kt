@@ -11,95 +11,76 @@ class AuthenticationControllerImpl(
     private val accountDao: AccountDao,
     private val authenticator: KeyValueAuthenticator<String, String>
 ) : AuthenticationController {
-    override fun registerAdminAccount(name: String, password: String): Pair<OutputModel, AccountEntity?> {
+    override fun registerAdminAccount(queryingAccount: AccountEntity?): Pair<OutputModel, AccountEntity?> {
+        if (queryingAccount == null || queryingAccount.accountType != AccountType.Administrator)
+            return createFailureResponse("Failed to register a new account.\nOnly superuser or users with administrator rights can register admin accounts.")
+
+        val (name, password, passwordMatch) = getAccountInfoWithConfirmation()
+        if (!passwordMatch)
+            return createFailureResponse("Failed to register a new account.\nPasswords do not match.")
+
         val accountValidation = checkAccountInfo(name, password)
         if (accountValidation.status != Status.Success)
-            return Pair(
-                accountValidation.copy(
-                    message = "Failed to register new account.\n" + accountValidation.message
-                ),
-                null
-            )
+            return createFailureResponse("Failed to register a new account.\n" + accountValidation.message)
 
         val hashedPassword = DI.hashFunction(password)
         val newAdminAccount = AccountEntity(name, hashedPassword, AccountType.Administrator)
         accountDao.addAccount(newAdminAccount)
-        return Pair(
-            OutputModel("An account with administrator rights by the name of $name has been created."),
+        return createSuccessResponse(
+            "An account with administrator rights by the name of $name has been created.",
             newAdminAccount
         )
     }
 
-    override fun registerVisitorAccount(name: String, password: String): Pair<OutputModel, AccountEntity?> {
+    override fun registerVisitorAccount(): Pair<OutputModel, AccountEntity?> {
+        val (name, password) = getAccountInfo()
         val accountValidation = checkAccountInfo(name, password)
         if (accountValidation.status != Status.Success)
-            return Pair(
-                accountValidation.copy(
-                    message = "Failed to register new account.\n" + accountValidation.message
-                ),
-                null
-            )
+            return createFailureResponse("Failed to register new account.\n" + accountValidation.message)
 
         val hashedPassword = DI.hashFunction(password)
         val newVisitorAccount = AccountEntity(name, hashedPassword, AccountType.Visitor)
         accountDao.addAccount(newVisitorAccount)
-        return Pair(OutputModel("A visitor account by the name of $name has been created."), newVisitorAccount)
+        return createSuccessResponse(
+            "A visitor account by the name of $name has been created.",
+            newVisitorAccount
+        )
     }
 
-    override fun logIntoAdminAccount(name: String, password: String): Pair<OutputModel, AccountEntity?> {
+    override fun logIntoAdminAccount(): Pair<OutputModel, AccountEntity?> {
+        val (name, password) = getAccountInfo()
         val account = accountDao.getAccount(name)
+
         if (account == null || account.accountType != AccountType.Administrator)
-            return Pair(
-                OutputModel(
-                    message = "Failed to log into the account.\nAdministrator account with the name $name does not exist.",
-                    status = Status.Failure
-                ),
-                null
-            )
+            return createFailureResponse("Failed to log into the account.\nAdministrator account with the name $name does not exist.")
 
         if (!authenticator.verify(name, password))
-            return Pair(
-                OutputModel(
-                    message = "Failed to log into the account.\nIncorrect password for account name $name.",
-                    status = Status.Failure
-                ),
-                null
-            )
-        return Pair(OutputModel("Logged into account $name with administrator rights."), account)
+            return createFailureResponse("Failed to log into the account.\nIncorrect password for account name $name.")
+
+        return createSuccessResponse("Logged into account $name with administrator rights.", account)
     }
 
-    override fun logIntoVisitorAccount(name: String, password: String): Pair<OutputModel, AccountEntity?> {
+    override fun logIntoVisitorAccount(): Pair<OutputModel, AccountEntity?> {
+        val (name, password) = getAccountInfo()
         val account = accountDao.getAccount(name)
+
         if (account == null || account.accountType != AccountType.Visitor)
-            return Pair(
-                OutputModel(
-                    message = "Failed to log into the account.\nVisitor account with the name $name does not exist.",
-                    status = Status.Failure
-                ),
-                null
-            )
+            return createFailureResponse("Failed to log into the account.\nVisitor account with the name $name does not exist.")
 
         if (!authenticator.verify(name, password))
-            return Pair(
-                OutputModel(
-                    message = "Failed to log into the account.\nIncorrect password for account name $name.",
-                    status = Status.Failure
-                ),
-                null
-            )
-        return Pair(OutputModel("Logged into account visitor account $name."), account)
+            return createFailureResponse("Failed to log into the account.\nIncorrect password for account name $name.")
+
+        return createSuccessResponse("Logged into account visitor account $name.", account)
     }
 
-    override fun logInAsSuperuser(securityCode: String): Pair<OutputModel, AccountEntity?> {
+    override fun logInAsSuperuser(): Pair<OutputModel, AccountEntity?> {
+        DI.inputManager.showPrompt("Enter the security code of the superuser: ")
+        val securityCode = DI.inputManager.getString()
+
         if (securityCode != DI.SUPERUSER_CODE)
-            return Pair(
-                OutputModel(
-                    message = "Failed to log in as superuser. Security code does not match.",
-                    status = Status.Failure
-                ),
-                null
-            )
-        return Pair(OutputModel("Logged into the superuser account."), DI.superuser)
+            return createFailureResponse("Failed to log in as superuser. Security code does not match.")
+
+        return createSuccessResponse("Logged into the superuser account.", DI.superuser)
     }
 
     private fun checkAccountName(accountName: String): OutputModel {
@@ -140,4 +121,37 @@ class AuthenticationControllerImpl(
             return checkPassword(password)
         return OutputModel("Valid account info.")
     }
+
+
+    private fun getAccountInfo(): Pair<String, String> {
+        DI.inputManager.showPrompt("Enter the name of the account: ")
+        val accountName = DI.inputManager.getString()
+
+        DI.inputManager.showPrompt("Enter the password: ")
+        val password = DI.inputManager.getString()
+
+        return Pair(accountName, password)
+    }
+
+    private fun getAccountInfoWithConfirmation(): Triple<String, String, Boolean> {
+        val (accountName, password) = getAccountInfo()
+        DI.inputManager.showPrompt("Enter the password again: ")
+        val passwordConfirmation = DI.inputManager.getString()
+
+        return Triple(accountName, password, password == passwordConfirmation)
+    }
+
+    private fun createFailureResponse(message: String): Pair<OutputModel, AccountEntity?> =
+        Pair(
+            OutputModel(
+                message = message,
+                status = Status.Failure
+            ), null
+        )
+
+    private fun createSuccessResponse(message: String, account: AccountEntity): Pair<OutputModel, AccountEntity?> =
+        Pair(
+            OutputModel(message = message),
+            account
+        )
 }

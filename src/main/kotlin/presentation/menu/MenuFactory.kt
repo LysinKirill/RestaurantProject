@@ -10,10 +10,10 @@ class MenuFactory {
     }
 
 
-    fun getMenuForRole(accountType: AccountType): Menu {
-        return when (accountType) {
-            AccountType.Administrator -> AdminMenu()
-            AccountType.Visitor -> VisitorMenu()
+    fun getMenuForUser(account: AccountEntity): Menu {
+        return when (account.accountType) {
+            AccountType.Administrator -> AdminMenu(DI.menuController, DI.authenticationController, account)
+            AccountType.Visitor -> VisitorMenu(account)
         }
     }
 }
