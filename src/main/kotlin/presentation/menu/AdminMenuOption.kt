@@ -8,5 +8,6 @@ enum class AdminMenuOption {
     SetDishCookingTime,
     GetAllMenuEntries,
     AddNewAdminAccount,
+    GetRestaurantRevenue,
     LogOut,
 }

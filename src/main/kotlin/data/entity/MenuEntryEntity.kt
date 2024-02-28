@@ -1,4 +1,4 @@
-package domain.entity
+package data.entity
 
 import kotlinx.serialization.Serializable
 

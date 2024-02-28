@@ -1,6 +1,6 @@
-package domain
+package domain.controllers
 
-import domain.entity.AccountEntity
+import data.entity.AccountEntity
 import presentation.model.OutputModel
 
 interface AuthenticationController {

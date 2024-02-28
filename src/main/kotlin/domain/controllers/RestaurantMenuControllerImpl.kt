@@ -1,9 +1,9 @@
-package domain
+package domain.controllers
 
 import data.MenuDao
 import di.DI
-import domain.entity.DishEntity
-import domain.entity.MenuEntryEntity
+import data.entity.DishEntity
+import data.entity.MenuEntryEntity
 import presentation.model.OutputModel
 import presentation.model.Status
 
@@ -104,8 +104,11 @@ class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMen
     }
 
     override fun getAvailableDishes(): OutputModel {
+        val menuEntries = menuDao.getAllEntries()
+        if(menuEntries.isEmpty())
+            return createFailureResponse("No dishes available.")
         return OutputModel(
-            menuDao.getAllEntries()
+            menuEntries
                 .filter { entry -> entry.remainingNumber > 0 }
                 .joinToString(separator = "\n\t", prefix = "Menu entries:\n\t"){
                         entry -> "${entry.dish}; Remaining dishes: ${entry.remainingNumber}"

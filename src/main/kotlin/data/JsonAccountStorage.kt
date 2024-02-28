@@ -1,6 +1,6 @@
 package data
 
-import domain.entity.AccountEntity
+import data.entity.AccountEntity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File

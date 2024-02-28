@@ -1,4 +1,4 @@
-package domain.entity
+package data.entity
 
 enum class AccountType {
     Visitor,

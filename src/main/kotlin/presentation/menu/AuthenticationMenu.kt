@@ -1,7 +1,7 @@
 package presentation.menu
 
-import domain.AuthenticationController
-import domain.entity.AccountEntity
+import domain.controllers.AuthenticationController
+import data.entity.AccountEntity
 import presentation.model.Status
 import kotlin.system.exitProcess
 

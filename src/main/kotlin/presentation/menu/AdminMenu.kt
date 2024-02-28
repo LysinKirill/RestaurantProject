@@ -1,14 +1,16 @@
 package presentation.menu
 
-import domain.AuthenticationController
-import domain.RestaurantMenuController
-import domain.entity.AccountEntity
-import domain.entity.AccountType
+import data.entity.AccountEntity
+import data.entity.AccountType
+import domain.controllers.AuthenticationController
+import domain.controllers.RestaurantMenuController
+import domain.controllers.StatisticsController
 
 
 class AdminMenu(
     private val menuController: RestaurantMenuController,
     private val authenticationController: AuthenticationController,
+    private val statisticsController: StatisticsController,
     private val userAccount: AccountEntity
 ) : Menu {
     init {
@@ -43,17 +45,18 @@ class AdminMenu(
                     authenticationController.registerAdminAccount(queryingAccount = userAccount).first
                 )
 
+                // Add a separate menu for statistics
+                AdminMenuOption.GetRestaurantRevenue -> println(statisticsController.getRevenue())
                 AdminMenuOption.LogOut -> {
                     println("Logging out...")
                     isActive = false
                 }
+
                 null -> {}
             }
 
         } while (isActive)
     }
-
-
 
 
     private fun getOption(): AdminMenuOption? {
@@ -62,21 +65,12 @@ class AdminMenu(
 
     private fun parseAction(userInput: String): AdminMenuOption? {
         try {
-            val optionNumber = userInput.toInt()
-            return when (optionNumber) {
-                1 -> AdminMenuOption.AddDishToMenu
-                2 -> AdminMenuOption.RemoveDishFromMenu
-                3 -> AdminMenuOption.SetDishCount
-                4 -> AdminMenuOption.SetDishPrice
-                5 -> AdminMenuOption.SetDishCookingTime
-                6 -> AdminMenuOption.GetAllMenuEntries
-                7 -> AdminMenuOption.AddNewAdminAccount
-                8 -> AdminMenuOption.LogOut
-                else -> run {
-                    println("Incorrect action chosen...")
-                    null
-                }
+            val optionNumber = userInput.toInt() - 1
+            if (optionNumber >= AdminMenuOption.entries.size || optionNumber < 0) {
+                println("Incorrect action chosen...")
+                return null
             }
+            return AdminMenuOption.entries[optionNumber]
         } catch (ex: Exception) {
             return null
         }

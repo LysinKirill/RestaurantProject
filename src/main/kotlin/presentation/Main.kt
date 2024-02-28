@@ -1,5 +1,6 @@
 package presentation
 
+import di.DI
 import presentation.menu.MenuFactory
 
 
@@ -18,7 +19,11 @@ fun main() {
 
         val menu = menuFactory.getMenuForUser(account)
         menu.handleInteractions()
+
+        DI.orderSystem.clearOrders()
     } catch (ex: Exception) {
         println("Unexpected exception has occurred: ${ex.message}")
+        println(ex.stackTrace)
+        throw ex
     }
 }

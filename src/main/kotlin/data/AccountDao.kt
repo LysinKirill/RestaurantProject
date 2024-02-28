@@ -1,6 +1,6 @@
 package data
 
-import domain.entity.AccountEntity
+import data.entity.AccountEntity
 
 interface AccountDao {
     fun getAccount(accountName: String) : AccountEntity?

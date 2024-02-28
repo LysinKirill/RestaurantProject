@@ -1,6 +1,6 @@
 package data
 
-import domain.entity.MenuEntryEntity
+import data.entity.MenuEntryEntity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File

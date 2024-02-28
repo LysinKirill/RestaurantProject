@@ -1,8 +1,8 @@
 package presentation.menu
 
 import di.DI
-import domain.entity.AccountEntity
-import domain.entity.AccountType
+import data.entity.AccountEntity
+import data.entity.AccountType
 
 class MenuFactory {
     fun getAuthenticationMenu(): ResponsiveMenu<AccountEntity> {
@@ -12,8 +12,17 @@ class MenuFactory {
 
     fun getMenuForUser(account: AccountEntity): Menu {
         return when (account.accountType) {
-            AccountType.Administrator -> AdminMenu(DI.menuController, DI.authenticationController, account)
-            AccountType.Visitor -> VisitorMenu(account)
+            AccountType.Administrator -> AdminMenu(
+                menuController = DI.menuController,
+                authenticationController = DI.authenticationController,
+                statisticsController = DI.statisticsController,
+                userAccount = account
+            )
+            AccountType.Visitor -> VisitorMenu(
+                menuController = DI.menuController,
+                orderSystem = DI.orderSystem,
+                userAccount = account
+            )
         }
     }
 }

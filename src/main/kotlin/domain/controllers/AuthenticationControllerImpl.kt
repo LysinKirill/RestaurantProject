@@ -1,9 +1,10 @@
-package domain
+package domain.controllers
 
 import data.AccountDao
 import di.DI
-import domain.entity.AccountEntity
-import domain.entity.AccountType
+import domain.KeyValueAuthenticator
+import data.entity.AccountEntity
+import data.entity.AccountType
 import presentation.model.OutputModel
 import presentation.model.Status
 
