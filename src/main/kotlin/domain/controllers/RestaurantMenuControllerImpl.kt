@@ -1,6 +1,6 @@
 package domain.controllers
 
-import data.MenuDao
+import data.dao.interfaces.MenuDao
 import di.DI
 import data.entity.DishEntity
 import data.entity.MenuEntryEntity

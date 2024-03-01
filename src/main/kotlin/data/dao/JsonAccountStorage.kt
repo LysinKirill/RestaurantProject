@@ -1,5 +1,6 @@
-package data
+package data.dao
 
+import data.dao.interfaces.AccountDao
 import data.entity.AccountEntity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

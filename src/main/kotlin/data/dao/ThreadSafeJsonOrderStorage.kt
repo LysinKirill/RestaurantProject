@@ -1,5 +1,6 @@
-package data
+package data.dao
 
+import data.dao.interfaces.OrderDao
 import data.entity.DishEntity
 import data.entity.OrderEntity
 import data.entity.OrderStatus

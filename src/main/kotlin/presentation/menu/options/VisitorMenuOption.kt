@@ -1,4 +1,4 @@
-package presentation.menu
+package presentation.menu.options
 
 enum class VisitorMenuOption {
     CreateOrder,

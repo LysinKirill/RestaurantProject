@@ -6,19 +6,28 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
+import java.time.LocalDateTime
 
 class JsonReviewStorage(
     private val jsonReviewStoragePath: String
 ) : ReviewDao {
-    override fun addReview(dishName: String, text: String, rating: Byte) {
+    override fun addReview(
+        accountName: String,
+        dishName: String,
+        text: String,
+        rating: Byte,
+        timeStamp: LocalDateTime,
+    ) {
         val storedReviews = getAllReviews().toMutableList()
         val newId = if (storedReviews.isEmpty()) 1 else storedReviews.maxOf { order -> order.id } + 1
 
         val newReview = ReviewEntity(
             id = newId,
+            accountName = accountName,
             dishName = dishName,
             text = text,
-            rating = rating
+            rating = rating,
+            timeStamp = timeStamp,
         )
         storedReviews.add(newReview)
         writeTextToFile(jsonReviewStoragePath, Json.encodeToString(storedReviews.toList()))

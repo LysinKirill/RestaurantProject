@@ -1,10 +1,13 @@
 package di
 
-import data.*
+import data.dao.*
+import data.dao.interfaces.*
 import domain.*
 import data.entity.AccountEntity
 import data.entity.AccountType
 import domain.controllers.*
+import domain.services.PaymentService
+import domain.services.PaymentServiceImpl
 import java.security.MessageDigest
 
 object DI {
@@ -12,6 +15,7 @@ object DI {
     private const val MENU_STORAGE_PATH = "src/main/resources/menu_storage.json"
     private const val ORDER_STORAGE_PATH = "src/main/resources/order_storage.json"
     private const val STATISTICS_STORAGE_PATH = "src/main/resources/statistics_storage.json"
+    private const val REVIEW_STORAGE_PATH = "src/main/resources/review_storage.json"
 
     const val SUPERUSER_CODE: String = "SuperUser1337"
     private val authenticator: KeyValueAuthenticator<String, String>
@@ -27,7 +31,7 @@ object DI {
         get() = RestaurantMenuControllerImpl(menuDao)
 
     val statisticsController: StatisticsController
-        get() = StatisticsControllerImpl(statisticsDao)
+        get() = StatisticsControllerImpl(statisticsDao, reviewDao, orderDao)
 
     val superuser: AccountEntity by lazy {
         AccountEntity("Admin", "_", AccountType.Administrator)
@@ -68,6 +72,10 @@ object DI {
     }
 
     private val statisticsDao: RestaurantStatisticsDao by lazy {
-        RestaurantStatisticsStorage(STATISTICS_STORAGE_PATH)
+        JsonRestaurantStatisticsStorage(STATISTICS_STORAGE_PATH)
+    }
+
+    private val reviewDao: ReviewDao by lazy {
+        JsonReviewStorage(REVIEW_STORAGE_PATH)
     }
 }

@@ -1,5 +1,6 @@
-package data
+package data.dao
 
+import data.dao.interfaces.MenuDao
 import data.entity.MenuEntryEntity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

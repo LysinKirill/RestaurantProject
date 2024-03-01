@@ -1,6 +1,6 @@
 package domain.controllers
 
-import data.AccountDao
+import data.dao.interfaces.AccountDao
 import di.DI
 import domain.KeyValueAuthenticator
 import data.entity.AccountEntity

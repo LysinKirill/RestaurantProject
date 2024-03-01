@@ -1,6 +1,6 @@
-package domain
+package domain.services
 
-import data.RestaurantStatisticsDao
+import data.dao.interfaces.RestaurantStatisticsDao
 import data.entity.AccountEntity
 import di.DI
 

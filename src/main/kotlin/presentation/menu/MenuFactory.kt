@@ -15,7 +15,8 @@ class MenuFactory {
             AccountType.Administrator -> AdminMenu(
                 menuController = DI.menuController,
                 authenticationController = DI.authenticationController,
-                statisticsController = DI.statisticsController,
+                //statisticsController = DI.statisticsController,
+                statisticsMenu = StatisticsMenu(DI.statisticsController),
                 userAccount = account
             )
             AccountType.Visitor -> VisitorMenu(

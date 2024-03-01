@@ -4,13 +4,14 @@ import data.entity.AccountEntity
 import data.entity.AccountType
 import domain.controllers.AuthenticationController
 import domain.controllers.RestaurantMenuController
-import domain.controllers.StatisticsController
+import presentation.menu.options.AdminMenuOption
 
 
 class AdminMenu(
     private val menuController: RestaurantMenuController,
     private val authenticationController: AuthenticationController,
-    private val statisticsController: StatisticsController,
+    private val statisticsMenu: Menu,
+    //private val statisticsController: StatisticsController,
     private val userAccount: AccountEntity
 ) : Menu {
     init {
@@ -20,7 +21,6 @@ class AdminMenu(
             throw Exception("Account ${userAccount.name} has no access right to view this menu.")
     }
 
-    private var isActive = true
     override fun displayMenu() {
         println(
             AdminMenuOption.entries
@@ -30,7 +30,7 @@ class AdminMenu(
     }
 
     override fun handleInteractions() {
-        isActive = true
+        var isActive = true
         do {
             println("Choose one of the following options.")
             displayMenu()
@@ -46,7 +46,7 @@ class AdminMenu(
                 )
 
                 // Add a separate menu for statistics
-                AdminMenuOption.GetRestaurantRevenue -> println(statisticsController.getRevenue())
+                AdminMenuOption.OpenStatisticsMenu -> statisticsMenu.handleInteractions()
                 AdminMenuOption.LogOut -> {
                     println("Logging out...")
                     isActive = false

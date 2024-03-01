@@ -1,6 +1,6 @@
 package domain
 
-import data.AccountDao
+import data.dao.interfaces.AccountDao
 
 class HashAuthenticator(
     private val accountDao: AccountDao,

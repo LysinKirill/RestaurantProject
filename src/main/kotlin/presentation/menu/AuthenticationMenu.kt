@@ -2,6 +2,7 @@ package presentation.menu
 
 import domain.controllers.AuthenticationController
 import data.entity.AccountEntity
+import presentation.menu.options.AuthenticationMenuOption
 import presentation.model.Status
 import kotlin.system.exitProcess
 

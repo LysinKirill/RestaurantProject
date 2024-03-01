@@ -1,4 +1,4 @@
-package presentation.menu
+package presentation.menu.options
 
 enum class AdminMenuOption {
     AddDishToMenu,
@@ -8,6 +8,6 @@ enum class AdminMenuOption {
     SetDishCookingTime,
     GetAllMenuEntries,
     AddNewAdminAccount,
-    GetRestaurantRevenue,
+    OpenStatisticsMenu,
     LogOut,
 }

@@ -1,4 +1,4 @@
-package data
+package data.dao.interfaces
 
 import data.entity.DishEntity
 import data.entity.OrderEntity

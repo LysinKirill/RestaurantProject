@@ -4,4 +4,5 @@ enum class OrderStatus {
     Created,
     Cooking,
     Ready,
+    PaidFor,
 }

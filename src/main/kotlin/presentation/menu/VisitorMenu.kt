@@ -3,6 +3,7 @@ package presentation.menu
 import domain.OrderProcessingSystem
 import domain.controllers.RestaurantMenuController
 import data.entity.AccountEntity
+import presentation.menu.options.VisitorMenuOption
 import presentation.model.Status
 
 class VisitorMenu(

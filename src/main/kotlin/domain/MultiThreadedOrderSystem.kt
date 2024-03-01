@@ -1,12 +1,13 @@
 package domain
 
-import data.MenuDao
-import data.OrderDao
+import data.dao.interfaces.MenuDao
+import data.dao.interfaces.OrderDao
 import data.entity.AccountEntity
 import data.entity.DishEntity
 import data.entity.OrderEntity
 import data.entity.OrderStatus
 import di.DI
+import domain.services.PaymentService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.concurrent.thread
@@ -30,6 +31,7 @@ class MultiThreadedOrderSystem(
                     executeOrder(order)
                 }
                 OrderStatus.Ready -> continue
+                OrderStatus.PaidFor -> continue
             }
         }
     }
@@ -81,7 +83,7 @@ class MultiThreadedOrderSystem(
         val orderId = DI.inputManager.getInt()
 
         val order = orderDao.getOrder(orderId)
-        if (order == null) {
+        if (order == null || order.status != OrderStatus.Cooking) {
             println("Order with ID = $orderId not found")
             return
         }
@@ -165,7 +167,8 @@ class MultiThreadedOrderSystem(
             return
         }
 
-        orderDao.removeOrder(orderId)
+        orderDao.updateOrder(order.copy(status = OrderStatus.PaidFor))
+        //orderDao.removeOrder(orderId)
         println("Payment received.")
     }
 
