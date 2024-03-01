@@ -1,12 +1,13 @@
-package data
+package data.dao
 
+import data.dao.interfaces.RestaurantStatisticsDao
 import data.entity.RestaurantStatisticsEntity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
 
-class RestaurantStatisticsStorage(
+class JsonRestaurantStatisticsStorage(
     private val jsonRestaurantStatisticsPath: String
 ) : RestaurantStatisticsDao {
     override fun getStatistics() : RestaurantStatisticsEntity {
