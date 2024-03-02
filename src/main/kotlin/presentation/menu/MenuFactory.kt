@@ -1,8 +1,8 @@
 package presentation.menu
 
-import di.DI
 import data.entity.AccountEntity
 import data.entity.AccountType
+import di.DI
 
 class MenuFactory {
     fun getAuthenticationMenu(): ResponsiveMenu<AccountEntity> {
@@ -15,15 +15,24 @@ class MenuFactory {
             AccountType.Administrator -> AdminMenu(
                 menuController = DI.menuController,
                 authenticationController = DI.authenticationController,
-                //statisticsController = DI.statisticsController,
-                statisticsMenu = StatisticsMenu(DI.statisticsController),
+                statisticsMenu = getStatisticsMenu(),
                 userAccount = account
             )
+
             AccountType.Visitor -> VisitorMenu(
                 menuController = DI.menuController,
                 orderSystem = DI.orderSystem,
-                userAccount = account
+                reviewMenu = getReviewMenu(account),
+                userAccount = account,
             )
         }
     }
+
+    private fun getReviewMenu(account: AccountEntity) = ReviewMenu(
+        reviewController = DI.reviewController,
+        orderDao = DI.orderDao,
+        account = account,
+    )
+
+    private fun getStatisticsMenu() = StatisticsMenu(DI.statisticsController)
 }

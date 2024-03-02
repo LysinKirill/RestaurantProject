@@ -48,5 +48,4 @@ class StatisticsMenu(private val statisticsController: StatisticsController) : M
             return null
         }
     }
-
 }

@@ -9,6 +9,7 @@ import presentation.model.Status
 class VisitorMenu(
     private val menuController: RestaurantMenuController,
     private val orderSystem: OrderProcessingSystem,
+    private val reviewMenu: ReviewMenu,
     private val userAccount: AccountEntity
 ) : Menu {
     override fun displayMenu() {
@@ -41,13 +42,13 @@ class VisitorMenu(
                 VisitorMenuOption.AddDishToOrder -> orderSystem.addDishToOrder(userAccount)
                 VisitorMenuOption.CancelOrder -> orderSystem.cancelOrder(userAccount)
                 VisitorMenuOption.PayForOrder -> orderSystem.payForOrder(userAccount)
+                VisitorMenuOption.OpenReviewMenu -> reviewMenu.handleInteractions()
                 VisitorMenuOption.LogOut -> {
                     println("Logging out...")
                     isActive = false
                 }
 
                 null -> {}
-
             }
 
         } while (isActive)

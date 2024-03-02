@@ -23,7 +23,5 @@ fun main() {
         DI.orderSystem.clearOrders()
     } catch (ex: Exception) {
         println("Unexpected exception has occurred: ${ex.message}")
-        println(ex.stackTrace)
-        throw ex
     }
 }

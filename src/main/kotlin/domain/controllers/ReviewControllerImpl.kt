@@ -1,31 +1,40 @@
 package domain.controllers
 
+import data.dao.interfaces.OrderDao
 import data.dao.interfaces.ReviewDao
 import data.entity.AccountEntity
-import data.entity.OrderEntity
+import data.entity.OrderStatus
 import di.DI
 import presentation.model.OutputModel
 import presentation.model.Status
 import java.time.LocalDateTime
 
-class ReviewControllerImpl(private val reviewDao: ReviewDao) : ReviewController {
-    override fun getDishReviews(account: AccountEntity): OutputModel = OutputModel(
-        reviewDao
-            .getAllReviews()
-            .filter { it.accountName == account.name }
-            .joinToString(separator = "\n\t", prefix = "Reviews for account \"${account.name}\": \n\t") {
-                "Dish: \"${it.dishName}\", Rating: ${it.rating}, Review: ${it.text}"
-            }
-    )
+class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDao: OrderDao) : ReviewController {
+    override fun getDishReviews(account: AccountEntity): OutputModel {
+        val reviews = reviewDao.getAllReviews()
+        if (reviews.isEmpty())
+            return OutputModel("No reviews found on account ${account.name}.", Status.Failure)
+        return OutputModel(
+            reviews
+                .filter { it.accountName == account.name }
+                .joinToString(separator = "\n\t", prefix = "Reviews for account \"${account.name}\": \n\t") {
+                    "Review ID: ${it.id}, Dish: \"${it.dishName}\", Rating: ${it.rating}, Review: ${it.text}"
+                }
+        )
+    }
 
-    override fun leaveReview(account: AccountEntity, order: OrderEntity): OutputModel {
+    override fun leaveReview(account: AccountEntity): OutputModel {
         DI.inputManager.showPrompt("Enter the name of the dish you want to leave a review on: ")
         val dishName = DI.inputManager.getString()
+        val paidDishes = orderDao
+                .getAllOrders()
+                .filter { it.visitorAccountName == account.name && it.status == OrderStatus.PaidFor }
+                .flatMap { it.dishes }
 
-        if (order.dishes.none { it.name == dishName })
+        if (paidDishes.none { it.name == dishName })
             return OutputModel(
                 status = Status.Failure,
-                message = "Dish \"$dishName\" was not in your order. Cannot leave a review on it."
+                message = "Dish \"$dishName\" was not found in any order you paid for. Cannot leave a review on it."
             )
 
         val reviewInfo = getReviewDetails()
@@ -51,10 +60,6 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao) : ReviewController 
             status = Status.Failure,
             message = "No record of review with ID = $reviewId for account \"${account.name}\" found."
         )
-
-
-
-        DI.inputManager.showPrompt("Enter new rating for your review: ")
 
         val reviewInfo = getReviewDetails()
         if (reviewInfo.first == Status.Failure)
@@ -84,7 +89,7 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao) : ReviewController 
             return Triple(
                 Status.Failure,
                 0,
-                "Unable to create a review: rating should be in the range from 1 to 10."
+                "Rating should be in the range from 1 to 10."
             )
 
         DI.inputManager.showPrompt("Enter your review: ")

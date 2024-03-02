@@ -6,5 +6,6 @@ enum class VisitorMenuOption {
     AddDishToOrder,
     CancelOrder,
     PayForOrder,
-    LogOut
+    OpenReviewMenu,
+    LogOut,
 }

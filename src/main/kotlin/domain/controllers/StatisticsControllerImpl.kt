@@ -56,7 +56,7 @@ class StatisticsControllerImpl(
             .sortedByDescending { it.second }
 
         DI.inputManager.showPrompt("Enter the number of popular dishes to be shown: ")
-        val popularDishCount = Math.max(DI.inputManager.getInt(), dishCounts.size)
+        val popularDishCount = DI.inputManager.getInt().coerceIn(0, dishCounts.size)
         val popularDishes = dishCounts.take(popularDishCount)
         return OutputModel(
             popularDishes.joinToString(
@@ -92,7 +92,7 @@ class StatisticsControllerImpl(
         }
 
         return OutputModel(
-            "The number of orders completed in the during the specified time interval: ${
+            "The number of orders completed during the specified time interval: ${
                 orders.count {
                     belongsToInterval(
                         it.finishTime,

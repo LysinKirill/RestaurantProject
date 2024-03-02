@@ -33,6 +33,9 @@ object DI {
     val statisticsController: StatisticsController
         get() = StatisticsControllerImpl(statisticsDao, reviewDao, orderDao)
 
+    val reviewController: ReviewController
+        get() = ReviewControllerImpl(reviewDao, orderDao)
+
     val superuser: AccountEntity by lazy {
         AccountEntity("Admin", "_", AccountType.Administrator)
         // password "_" will never match anything because hash can never be a single character long
@@ -67,7 +70,7 @@ object DI {
         JsonMenuStorage(MENU_STORAGE_PATH)
     }
 
-    private val orderDao: OrderDao by lazy {
+    val orderDao: OrderDao by lazy {
         ThreadSafeJsonOrderStorage(ORDER_STORAGE_PATH)
     }
 

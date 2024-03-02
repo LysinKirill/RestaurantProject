@@ -1,8 +1,10 @@
 package domain
 
 import data.entity.AccountEntity
+import data.entity.OrderEntity
 
 interface OrderProcessingSystem {
+    fun getUserOrders(user: AccountEntity) : List<OrderEntity>
     fun showUserOrders(user: AccountEntity)
     fun createOrder(user: AccountEntity)
     fun addDishToOrder(user: AccountEntity)

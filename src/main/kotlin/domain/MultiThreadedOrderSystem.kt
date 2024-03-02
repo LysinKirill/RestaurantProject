@@ -21,15 +21,16 @@ class MultiThreadedOrderSystem(
 
     init {
         for (order in orderDao.getAllOrders()) {
-            when(order.status) {
+            when (order.status) {
                 OrderStatus.Created -> executeOrder(order)
                 OrderStatus.Cooking -> {
-                    if(LocalDateTime.now().isAfter(order.finishTime)) {
+                    if (LocalDateTime.now().isAfter(order.finishTime)) {
                         orderDao.updateOrder(order.copy(status = OrderStatus.Ready))
                         continue
                     }
                     executeOrder(order)
                 }
+
                 OrderStatus.Ready -> continue
                 OrderStatus.PaidFor -> continue
             }
@@ -37,6 +38,7 @@ class MultiThreadedOrderSystem(
     }
 
 
+    override fun getUserOrders(user: AccountEntity): List<OrderEntity> = getUserOrders(user.name)
     override fun showUserOrders(user: AccountEntity) {
         println("Active orders of \"${user.name}\":")
         showOrders(getUserOrders(user.name))
@@ -84,9 +86,11 @@ class MultiThreadedOrderSystem(
 
         val order = orderDao.getOrder(orderId)
         if (order == null || order.status != OrderStatus.Cooking) {
-            println("Order with ID = $orderId not found")
+            println("Order with ID = $orderId is not being cooked.")
             return
         }
+
+        // Show menu to user
 
         DI.inputManager.showPrompt("Enter the name of the dish to be added to your order: ")
         val dishName = DI.inputManager.getString()
@@ -101,8 +105,12 @@ class MultiThreadedOrderSystem(
             return
         }
 
-        val updatedOrder = order.copy(dishes = order.dishes + menuEntryEntity.dish)
+        val updatedOrder = order.copy(
+            dishes = order.dishes + menuEntryEntity.dish,
+            finishTime = getUpdatedFinishTime(order.finishTime, menuEntryEntity.dish)
+        )
         orderDao.updateOrder(updatedOrder)
+        println("Your order has been updated.")
         orderThreads[orderId]?.interrupt()
         executeOrder(updatedOrder)
     }
@@ -162,7 +170,7 @@ class MultiThreadedOrderSystem(
         paymentService.requestPayment("Your total for this order is %.2f.\nProvide payment: ".format(total))
         val paymentSuccess = paymentService.receivePayment(user, total)
 
-        if(!paymentSuccess) {
+        if (!paymentSuccess) {
             println("Payment failed...")
             return
         }
@@ -260,6 +268,13 @@ class MultiThreadedOrderSystem(
     private fun calculateFinishTime(dishList: List<DishEntity>): LocalDateTime {
         val finishTime = LocalDateTime.now().plusSeconds(dishList.maxOf { it.cookingTimeInSeconds }.toLong())
         return finishTime
+    }
+
+    private fun getUpdatedFinishTime(currentFinishTime: LocalDateTime, newDish: DishEntity): LocalDateTime {
+        val dishFinishTime = LocalDateTime.now().plusSeconds(newDish.cookingTimeInSeconds.toLong())
+        if (dishFinishTime.isAfter(currentFinishTime))
+            return dishFinishTime
+        return currentFinishTime
     }
 
     private fun getUserOrders(userName: String): List<OrderEntity> =
