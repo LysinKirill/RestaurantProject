@@ -7,5 +7,5 @@ interface StatisticsController {
     fun getDishReviews(): OutputModel
     fun getPopularDishes(): OutputModel
     fun getAverageRatingOfDishes(): OutputModel
-    fun getOrderCountOverPeriod(): OutputModel // Maybe should use Period or DatePeriod
+    fun getOrderCountOverPeriod(): OutputModel
 }

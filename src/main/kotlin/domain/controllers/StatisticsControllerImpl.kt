@@ -3,7 +3,7 @@ package domain.controllers
 import data.dao.interfaces.OrderDao
 import data.dao.interfaces.RestaurantStatisticsDao
 import data.dao.interfaces.ReviewDao
-import di.DI
+import domain.InputManager
 import presentation.model.OutputModel
 import presentation.model.Status
 import java.time.LocalDateTime
@@ -13,6 +13,7 @@ class StatisticsControllerImpl(
     private val statisticsDao: RestaurantStatisticsDao,
     private val reviewDao: ReviewDao,
     private val orderDao: OrderDao,
+    private val inputManager: InputManager,
 ) : StatisticsController {
     override fun getRevenue(): OutputModel {
         val statistics = statisticsDao.getStatistics()
@@ -55,8 +56,8 @@ class StatisticsControllerImpl(
             .toList()
             .sortedByDescending { it.second }
 
-        DI.inputManager.showPrompt("Enter the number of popular dishes to be shown: ")
-        val popularDishCount = DI.inputManager.getInt().coerceIn(0, dishCounts.size)
+        inputManager.showPrompt("Enter the number of popular dishes to be shown: ")
+        val popularDishCount = inputManager.getInt().coerceIn(0, dishCounts.size)
         val popularDishes = dishCounts.take(popularDishCount)
         return OutputModel(
             popularDishes.joinToString(
@@ -82,11 +83,11 @@ class StatisticsControllerImpl(
         val endDateTime: LocalDateTime
 
         try {
-            DI.inputManager.showPrompt("Enter the date and time of the start of the period in the following format [yyyy-MM-dd]T[hh:mm:ss]: ")
-            startDateTime = LocalDateTime.parse(DI.inputManager.getString())
+            inputManager.showPrompt("Enter the date and time of the start of the period in the following format [yyyy-MM-dd]T[hh:mm:ss]: ")
+            startDateTime = LocalDateTime.parse(inputManager.getString())
 
-            DI.inputManager.showPrompt("Enter the date and time of the end of the period in the following format [yyyy-MM-dd]T[hh:mm:ss]: ")
-            endDateTime = LocalDateTime.parse(DI.inputManager.getString())
+            inputManager.showPrompt("Enter the date and time of the end of the period in the following format [yyyy-MM-dd]T[hh:mm:ss]: ")
+            endDateTime = LocalDateTime.parse(inputManager.getString())
         } catch (ex: DateTimeParseException) {
             return OutputModel("Unable to parse the date.", Status.Failure)
         }

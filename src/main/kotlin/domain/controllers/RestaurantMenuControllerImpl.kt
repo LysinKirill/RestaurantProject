@@ -1,21 +1,24 @@
 package domain.controllers
 
 import data.dao.interfaces.MenuDao
-import di.DI
 import data.entity.DishEntity
 import data.entity.MenuEntryEntity
+import domain.InputManager
 import presentation.model.OutputModel
 import presentation.model.Status
 
-class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMenuController {
+class RestaurantMenuControllerImpl(
+    private val menuDao: MenuDao,
+    private val inputManager: InputManager,
+) : RestaurantMenuController {
     override fun addMenuEntry(): OutputModel {
         val getDishResponse = getNewDish()
         val dish = getDishResponse.second
         if (getDishResponse.first.status == Status.Failure || dish == null)
             return createFailureResponse("Failed to add new entry to menu.\n" + getDishResponse.first.message)
 
-        DI.inputManager.showPrompt("Enter the amount of dishes: ")
-        val dishNumber = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter the amount of dishes: ")
+        val dishNumber = inputManager.getInt()
         if (dishNumber <= 0)
             return createFailureResponse("Failed to add new entry to menu.\nNumber of dishes should be a positive integer.")
 
@@ -24,8 +27,8 @@ class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMen
     }
 
     override fun removeMenuEntry(): OutputModel {
-        DI.inputManager.showPrompt("Enter the name of the dish to be removed from the menu: ")
-        val dishToRemoveName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the dish to be removed from the menu: ")
+        val dishToRemoveName = inputManager.getString()
 
         if (menuDao.getEntryByDishName(dishToRemoveName) == null)
             return createFailureResponse("Dish with name $dishToRemoveName is not on the menu.")
@@ -35,14 +38,14 @@ class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMen
     }
 
     override fun changeDishPrice(): OutputModel {
-        DI.inputManager.showPrompt("Enter the name of the dish which price will be changed: ")
-        val dishName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the dish which price will be changed: ")
+        val dishName = inputManager.getString()
 
         val menuEntry = menuDao.getEntryByDishName(dishName)
             ?: return createFailureResponse("Dish with name $dishName is not on the menu.")
 
-        DI.inputManager.showPrompt("Enter new price for the dish \"$dishName\": ")
-        val newPrice = DI.inputManager.getDouble()
+        inputManager.showPrompt("Enter new price for the dish \"$dishName\": ")
+        val newPrice = inputManager.getDouble()
         if (newPrice <= 0)
             return createFailureResponse("Failed to change dish price.\nPrice of dish should be a positive real number.")
 
@@ -56,14 +59,14 @@ class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMen
     }
 
     override fun changeDishCount(): OutputModel {
-        DI.inputManager.showPrompt("Enter the name of the dish which amount will be changed: ")
-        val dishName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the dish which amount will be changed: ")
+        val dishName = inputManager.getString()
 
         val menuEntry = menuDao.getEntryByDishName(dishName)
             ?: return createFailureResponse("Dish with name $dishName is not on the menu.")
 
-        DI.inputManager.showPrompt("Enter new amount for the dish \"$dishName\": ")
-        val newAmount = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter new amount for the dish \"$dishName\": ")
+        val newAmount = inputManager.getInt()
         if (newAmount < 0)
             return createFailureResponse("Failed to change dish amount.\nAmount of dish should be a non-negative integer.")
 
@@ -73,17 +76,19 @@ class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMen
     }
 
     override fun changeDishCookingTime(): OutputModel {
-        DI.inputManager.showPrompt("Enter the name of the dish which cooking time will be changed: ")
-        val dishName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the dish which cooking time will be changed: ")
+        val dishName = inputManager.getString()
 
         val menuEntry = menuDao.getEntryByDishName(dishName)
             ?: return createFailureResponse("Dish with name $dishName is not on the menu.")
 
-        DI.inputManager.showPrompt("Enter new cooking time (in seconds) for the dish \"$dishName\": ")
-        val newCookingTimeInSeconds = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter new cooking time (in seconds) for the dish \"$dishName\": ")
+        val newCookingTimeInSeconds = inputManager.getInt()
         if (newCookingTimeInSeconds <= 0)
-            return createFailureResponse("Failed to change dish cooking time." +
-                    "\nCooking time of dish should be a positive integer representing the number of seconds required to cook the dish.")
+            return createFailureResponse(
+                "Failed to change dish cooking time." +
+                        "\nCooking time of dish should be a positive integer representing the number of seconds required to cook the dish."
+            )
 
         val updatedEntry = menuEntry.copy(
             dish = menuEntry.dish.copy(
@@ -97,38 +102,38 @@ class RestaurantMenuControllerImpl(private val menuDao: MenuDao) : RestaurantMen
     override fun getAllMenuEntries(): OutputModel {
         return OutputModel(
             menuDao.getAllEntries()
-                .joinToString(separator = "\n\t", prefix = "Menu entries:\n\t"){
-                    entry -> "${entry.dish}; Remaining dishes: ${entry.remainingNumber}"
+                .joinToString(separator = "\n\t", prefix = "Menu entries:\n\t") { entry ->
+                    "${entry.dish}; Remaining dishes: ${entry.remainingNumber}"
                 }
         )
     }
 
     override fun getAvailableDishes(): OutputModel {
         val menuEntries = menuDao.getAllEntries()
-        if(menuEntries.isEmpty())
+        if (menuEntries.isEmpty())
             return createFailureResponse("No dishes available.")
         return OutputModel(
             menuEntries
                 .filter { entry -> entry.remainingNumber > 0 }
-                .joinToString(separator = "\n\t", prefix = "Menu entries:\n\t"){
-                        entry -> "${entry.dish}; Remaining dishes: ${entry.remainingNumber}"
+                .joinToString(separator = "\n\t", prefix = "Menu entries:\n\t") { entry ->
+                    "${entry.dish}; Remaining dishes: ${entry.remainingNumber}"
                 }
         )
     }
 
     private fun getNewDish(): Pair<OutputModel, DishEntity?> {
-        DI.inputManager.showPrompt("Enter the name of the new dish: ")
-        val dishName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the new dish: ")
+        val dishName = inputManager.getString()
         if (dishName.isBlank())
             return createFailurePairResponse("Dish name cannot be blank.")
 
-        DI.inputManager.showPrompt("Enter the price of the new dish: ")
-        val dishPrice = DI.inputManager.getDouble()
+        inputManager.showPrompt("Enter the price of the new dish: ")
+        val dishPrice = inputManager.getDouble()
         if (dishPrice <= 0)
             return createFailurePairResponse("Dish price should be a positive real number.")
 
-        DI.inputManager.showPrompt("Enter the cooking time of the new dish in seconds: ")
-        val dishCookingTime = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter the cooking time of the new dish in seconds: ")
+        val dishCookingTime = inputManager.getInt()
         if (dishCookingTime <= 0)
             return createFailurePairResponse("Dish cooking time should be a positive integer.")
 

@@ -6,7 +6,6 @@ import data.entity.AccountEntity
 import data.entity.DishEntity
 import data.entity.OrderEntity
 import data.entity.OrderStatus
-import di.DI
 import domain.services.PaymentService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -15,7 +14,8 @@ import kotlin.concurrent.thread
 class MultiThreadedOrderSystem(
     private val menuDao: MenuDao,
     private val orderDao: OrderDao,
-    private val paymentService: PaymentService
+    private val paymentService: PaymentService,
+    private val inputManager: InputManager,
 ) : OrderProcessingSystem {
     private val orderThreads: MutableMap<Int, Thread> = mutableMapOf<Int, Thread>()
 
@@ -46,10 +46,10 @@ class MultiThreadedOrderSystem(
 
     override fun createOrder(user: AccountEntity) {
         val dishList = mutableListOf<DishEntity>()
-        DI.inputManager.showPrompt("Start adding dishes to your order. When the order is complete enter an empty line.")
+        inputManager.showPrompt("Start adding dishes to your order. When the order is complete enter an empty line.")
         do {
-            DI.inputManager.showPrompt("Enter the name of the dish to be added to your order (or an empty line): ")
-            val dishName = DI.inputManager.getString()
+            inputManager.showPrompt("Enter the name of the dish to be added to your order (or an empty line): ")
+            val dishName = inputManager.getString()
             if (dishName.isEmpty()) break
 
             val menuEntryEntity = menuDao.getEntryByDishName(dishName)
@@ -81,8 +81,8 @@ class MultiThreadedOrderSystem(
         println("Active orders of \"${user.name}\":")
         showOrders(accountOrders)
 
-        DI.inputManager.showPrompt("Input the ID of the order you want to add a dish to: ")
-        val orderId = DI.inputManager.getInt()
+        inputManager.showPrompt("Input the ID of the order you want to add a dish to: ")
+        val orderId = inputManager.getInt()
 
         val order = orderDao.getOrder(orderId)
         if (order == null || order.status != OrderStatus.Cooking) {
@@ -92,8 +92,8 @@ class MultiThreadedOrderSystem(
 
         // Show menu to user
 
-        DI.inputManager.showPrompt("Enter the name of the dish to be added to your order: ")
-        val dishName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the dish to be added to your order: ")
+        val dishName = inputManager.getString()
 
         val menuEntryEntity = menuDao.getEntryByDishName(dishName)
         if (menuEntryEntity == null) {
@@ -127,8 +127,8 @@ class MultiThreadedOrderSystem(
         println("Active orders of \"${user.name}\" which are being cooked at the moment:")
         showOrders(userOrders)
 
-        DI.inputManager.showPrompt("Input the ID of the order you want to cancel: ")
-        val orderId = DI.inputManager.getInt()
+        inputManager.showPrompt("Input the ID of the order you want to cancel: ")
+        val orderId = inputManager.getInt()
 
 
         val cookingThread = orderThreads[orderId]
@@ -151,8 +151,8 @@ class MultiThreadedOrderSystem(
         println("List of orders that can be paid for: ")
         showOrders(completedOrders)
 
-        DI.inputManager.showPrompt("Enter the ID of the order you want to pay for: ")
-        val orderId = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter the ID of the order you want to pay for: ")
+        val orderId = inputManager.getInt()
 
         if (completedOrders.none { it.id == orderId }) {
             println("Order with ID = $orderId cannot be paid for at the moment.")
@@ -207,8 +207,8 @@ class MultiThreadedOrderSystem(
         println("Total: ${dishList.sumOf { it.price }}")
 
         do {
-            DI.inputManager.showPrompt("Confirm order? [Yes]/[No]")
-            val confirmation = DI.inputManager.getString()
+            inputManager.showPrompt("Confirm order? [Yes]/[No]")
+            val confirmation = inputManager.getString()
             if (confirmation.lowercase() == "no") {
                 println("The order has been cancelled.")
                 return
@@ -248,16 +248,16 @@ class MultiThreadedOrderSystem(
                 val cookingTime: java.time.Duration = java.time.Duration.between(startTimeInstant, finishTimeInstant)
                     ?: return@thread
 
-                // Check for null???
                 // Cooking order
                 Thread.sleep(cookingTime.toMillis())
 
+                // Introduce cooking strategy
+                // cookingStrategy.cook = Thread.sleep()
+
                 orderDao.updateOrder(order.copy(status = OrderStatus.Ready))
                 orderThreads.remove(order.id)
-            } catch (e: InterruptedException) {
-                //orderDao.removeOrder(orderId = order.id)
-                // TODO()
-                //orderDao.updateOrder(order.copy(status = OrderStatus.Ready))
+            } catch (_: InterruptedException) {
+                // Notify something about interruption?
             }
         }
 

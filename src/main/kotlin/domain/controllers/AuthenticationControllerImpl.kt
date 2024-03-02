@@ -1,16 +1,19 @@
 package domain.controllers
 
 import data.dao.interfaces.AccountDao
-import di.DI
 import domain.KeyValueAuthenticator
 import data.entity.AccountEntity
 import data.entity.AccountType
+import di.DI
+import domain.InputManager
 import presentation.model.OutputModel
 import presentation.model.Status
 
 class AuthenticationControllerImpl(
     private val accountDao: AccountDao,
-    private val authenticator: KeyValueAuthenticator<String, String>
+    private val authenticator: KeyValueAuthenticator<String, String>,
+    private val inputManager: InputManager,
+    private val hashFunction: (String) -> String,
 ) : AuthenticationController {
     override fun registerAdminAccount(queryingAccount: AccountEntity?): Pair<OutputModel, AccountEntity?> {
         if (queryingAccount == null || queryingAccount.accountType != AccountType.Administrator)
@@ -24,7 +27,7 @@ class AuthenticationControllerImpl(
         if (accountValidation.status != Status.Success)
             return createFailureResponse("Failed to register a new account.\n" + accountValidation.message)
 
-        val hashedPassword = DI.hashFunction(password)
+        val hashedPassword = hashFunction(password)
         val newAdminAccount = AccountEntity(name, hashedPassword, AccountType.Administrator)
         accountDao.addAccount(newAdminAccount)
         return createSuccessResponse(
@@ -39,7 +42,7 @@ class AuthenticationControllerImpl(
         if (accountValidation.status != Status.Success)
             return createFailureResponse("Failed to register new account.\n" + accountValidation.message)
 
-        val hashedPassword = DI.hashFunction(password)
+        val hashedPassword = hashFunction(password)
         val newVisitorAccount = AccountEntity(name, hashedPassword, AccountType.Visitor)
         accountDao.addAccount(newVisitorAccount)
         return createSuccessResponse(
@@ -75,8 +78,8 @@ class AuthenticationControllerImpl(
     }
 
     override fun logInAsSuperuser(): Pair<OutputModel, AccountEntity?> {
-        DI.inputManager.showPrompt("Enter the security code of the superuser: ")
-        val securityCode = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the security code of the superuser: ")
+        val securityCode = inputManager.getString()
 
         if (securityCode != DI.SUPERUSER_CODE)
             return createFailureResponse("Failed to log in as superuser. Security code does not match.")
@@ -125,19 +128,19 @@ class AuthenticationControllerImpl(
 
 
     private fun getAccountInfo(): Pair<String, String> {
-        DI.inputManager.showPrompt("Enter the name of the account: ")
-        val accountName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the account: ")
+        val accountName = inputManager.getString()
 
-        DI.inputManager.showPrompt("Enter the password: ")
-        val password = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the password: ")
+        val password = inputManager.getString()
 
         return Pair(accountName, password)
     }
 
     private fun getAccountInfoWithConfirmation(): Triple<String, String, Boolean> {
         val (accountName, password) = getAccountInfo()
-        DI.inputManager.showPrompt("Enter the password again: ")
-        val passwordConfirmation = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the password again: ")
+        val passwordConfirmation = inputManager.getString()
 
         return Triple(accountName, password, password == passwordConfirmation)
     }

@@ -4,12 +4,16 @@ import data.dao.interfaces.OrderDao
 import data.dao.interfaces.ReviewDao
 import data.entity.AccountEntity
 import data.entity.OrderStatus
-import di.DI
+import domain.InputManager
 import presentation.model.OutputModel
 import presentation.model.Status
 import java.time.LocalDateTime
 
-class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDao: OrderDao) : ReviewController {
+class ReviewControllerImpl(
+    private val reviewDao: ReviewDao,
+    private val orderDao: OrderDao,
+    private val inputManager: InputManager
+) : ReviewController {
     override fun getDishReviews(account: AccountEntity): OutputModel {
         val reviews = reviewDao.getAllReviews()
         if (reviews.isEmpty())
@@ -24,12 +28,12 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDa
     }
 
     override fun leaveReview(account: AccountEntity): OutputModel {
-        DI.inputManager.showPrompt("Enter the name of the dish you want to leave a review on: ")
-        val dishName = DI.inputManager.getString()
+        inputManager.showPrompt("Enter the name of the dish you want to leave a review on: ")
+        val dishName = inputManager.getString()
         val paidDishes = orderDao
-                .getAllOrders()
-                .filter { it.visitorAccountName == account.name && it.status == OrderStatus.PaidFor }
-                .flatMap { it.dishes }
+            .getAllOrders()
+            .filter { it.visitorAccountName == account.name && it.status == OrderStatus.PaidFor }
+            .flatMap { it.dishes }
 
         if (paidDishes.none { it.name == dishName })
             return OutputModel(
@@ -52,8 +56,8 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDa
     }
 
     override fun editReview(account: AccountEntity): OutputModel {
-        DI.inputManager.showPrompt("Enter the ID of the review to be changed: ")
-        val reviewId = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter the ID of the review to be changed: ")
+        val reviewId = inputManager.getInt()
 
         val review = reviewDao.getReview(reviewId.toLong())
         if (review == null || review.accountName != account.name) return OutputModel(
@@ -70,8 +74,8 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDa
     }
 
     override fun deleteReview(account: AccountEntity): OutputModel {
-        DI.inputManager.showPrompt("Enter the ID of the review to be deleted: ")
-        val reviewId = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter the ID of the review to be deleted: ")
+        val reviewId = inputManager.getInt()
         val review = reviewDao.getReview(reviewId.toLong())
         if (review == null || review.accountName != account.name)
             return OutputModel(
@@ -83,8 +87,8 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDa
     }
 
     private fun getReviewDetails(): Triple<Status, Byte, String> {
-        DI.inputManager.showPrompt("Enter your rating for the dish: ")
-        val rating = DI.inputManager.getInt()
+        inputManager.showPrompt("Enter your rating for the dish: ")
+        val rating = inputManager.getInt()
         if (rating < 1 || rating > 10)
             return Triple(
                 Status.Failure,
@@ -92,8 +96,8 @@ class ReviewControllerImpl(private val reviewDao: ReviewDao, private val orderDa
                 "Rating should be in the range from 1 to 10."
             )
 
-        DI.inputManager.showPrompt("Enter your review: ")
-        val reviewText = DI.inputManager.getString()
+        inputManager.showPrompt("Enter your review: ")
+        val reviewText = inputManager.getString()
         return Triple(Status.Success, rating.toByte(), reviewText)
     }
 }

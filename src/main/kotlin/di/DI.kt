@@ -25,16 +25,16 @@ object DI {
         get() = ConsoleInputManager()
 
     val authenticationController: AuthenticationController
-        get() = AuthenticationControllerImpl(accountDao, authenticator)
+        get() = AuthenticationControllerImpl(accountDao, authenticator, inputManager, hashFunction)
 
     val menuController: RestaurantMenuController
-        get() = RestaurantMenuControllerImpl(menuDao)
+        get() = RestaurantMenuControllerImpl(menuDao, inputManager)
 
     val statisticsController: StatisticsController
-        get() = StatisticsControllerImpl(statisticsDao, reviewDao, orderDao)
+        get() = StatisticsControllerImpl(statisticsDao, reviewDao, orderDao, inputManager)
 
     val reviewController: ReviewController
-        get() = ReviewControllerImpl(reviewDao, orderDao)
+        get() = ReviewControllerImpl(reviewDao, orderDao, inputManager)
 
     val superuser: AccountEntity by lazy {
         AccountEntity("Admin", "_", AccountType.Administrator)
@@ -42,7 +42,7 @@ object DI {
     }
 
     val orderSystem: OrderProcessingSystem by lazy {
-        MultiThreadedOrderSystem(menuDao, orderDao, paymentService)
+        MultiThreadedOrderSystem(menuDao, orderDao, paymentService, inputManager)
     }
 
 
@@ -60,7 +60,7 @@ object DI {
     }
 
     private val paymentService: PaymentService by lazy {
-        PaymentServiceImpl(statisticsDao)
+        PaymentServiceImpl(statisticsDao, inputManager)
     }
     private val accountDao: AccountDao by lazy {
         JsonAccountStorage(ACCOUNT_STORAGE_PATH)

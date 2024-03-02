@@ -2,10 +2,11 @@ package domain.services
 
 import data.dao.interfaces.RestaurantStatisticsDao
 import data.entity.AccountEntity
-import di.DI
+import domain.InputManager
 
 class PaymentServiceImpl(
-    private val statisticsDao: RestaurantStatisticsDao
+    private val statisticsDao: RestaurantStatisticsDao,
+    private val inputManager: InputManager,
 ) : PaymentService {
     override fun receivePayment(account: AccountEntity, paymentAmount: Double): Boolean {
         println("Processing the transaction...")
@@ -14,8 +15,8 @@ class PaymentServiceImpl(
             println("Cannot process the transaction.")
             return false
         }
-        DI.inputManager.showPrompt("Confirm transaction: [Yes]/[No]")
-        val confirmation = DI.inputManager.getString()
+        inputManager.showPrompt("Confirm transaction: [Yes]/[No]")
+        val confirmation = inputManager.getString()
         if(confirmation.lowercase() != "yes")
         {
             println("The transaction has been cancelled.")
