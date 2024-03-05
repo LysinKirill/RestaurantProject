@@ -20,10 +20,8 @@ class MenuFactory {
             )
 
             AccountType.Visitor -> VisitorMenu(
-                menuController = DI.menuController,
-                orderSystem = DI.orderSystem,
                 reviewMenu = getReviewMenu(account),
-                userAccount = account,
+                orderMenu = getOrderMenu(account),
             )
         }
     }
@@ -32,6 +30,12 @@ class MenuFactory {
         reviewController = DI.reviewController,
         orderDao = DI.orderDao,
         account = account,
+    )
+
+    private fun getOrderMenu(account: AccountEntity) = OrderMenu(
+        menuController = DI.menuController,
+        orderSystem = DI.orderSystem,
+        userAccount = account,
     )
 
     private fun getStatisticsMenu() = StatisticsMenu(DI.statisticsController)
