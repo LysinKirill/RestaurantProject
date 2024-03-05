@@ -11,7 +11,8 @@ class OrderMenu(
     private val menuController: RestaurantMenuController,
     private val orderSystem: OrderProcessingSystem,
     private val userAccount: AccountEntity,
-    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(OrderMenuOption::class.java)
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(OrderMenuOption::class.java),
+    private val requestStrategy: RequestOptionStrategy<OrderMenuOption> = ConsoleRequestOptionStrategy(OrderMenuOption::class.java),
 ) : Menu {
     override fun displayMenu() = displayStrategy.display()
 
@@ -20,7 +21,7 @@ class OrderMenu(
         do {
             println("Choose one of the following options.")
             displayMenu()
-            when (getOption()) {
+            when (requestStrategy.requestOption()) {
                 OrderMenuOption.CreateOrder -> {
                     val response = menuController.getAvailableDishes()
                     println(response.message)
@@ -44,22 +45,5 @@ class OrderMenu(
             }
 
         } while (isActive)
-    }
-
-    private fun getOption(): OrderMenuOption? {
-        return readlnOrNull()?.let { parseAction(it) }
-    }
-
-    private fun parseAction(userInput: String): OrderMenuOption? {
-        try {
-            val optionNumber = userInput.toInt() - 1
-            if (optionNumber >= OrderMenuOption.entries.size || optionNumber < 0) {
-                println("Incorrect action chosen...")
-                return null
-            }
-            return OrderMenuOption.entries[optionNumber]
-        } catch (ex: Exception) {
-            return null
-        }
     }
 }

@@ -13,6 +13,7 @@ class AdminMenu(
     private val statisticsMenu: Menu,
     private val userAccount: AccountEntity,
     private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(AdminMenuOption::class.java),
+    private val requestStrategy: RequestOptionStrategy<AdminMenuOption> = ConsoleRequestOptionStrategy(AdminMenuOption::class.java),
 ) : Menu {
     init {
         if (userAccount.accountType != AccountType.Administrator)
@@ -28,7 +29,7 @@ class AdminMenu(
         do {
             println("Choose one of the following options.")
             displayMenu()
-            when (getOption()) {
+            when (requestStrategy.requestOption()) {
                 AdminMenuOption.AddDishToMenu -> println(menuController.addMenuEntry())
                 AdminMenuOption.RemoveDishFromMenu -> println(menuController.removeMenuEntry())
                 AdminMenuOption.SetDishCount -> println(menuController.changeDishCount())
@@ -50,23 +51,5 @@ class AdminMenu(
             }
 
         } while (isActive)
-    }
-
-
-    private fun getOption(): AdminMenuOption? {
-        return readlnOrNull()?.let { parseAction(it) }
-    }
-
-    private fun parseAction(userInput: String): AdminMenuOption? {
-        try {
-            val optionNumber = userInput.toInt() - 1
-            if (optionNumber >= AdminMenuOption.entries.size || optionNumber < 0) {
-                println("Incorrect action chosen...")
-                return null
-            }
-            return AdminMenuOption.entries[optionNumber]
-        } catch (ex: Exception) {
-            return null
-        }
     }
 }

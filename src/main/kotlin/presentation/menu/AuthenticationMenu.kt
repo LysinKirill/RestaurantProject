@@ -8,7 +8,10 @@ import kotlin.system.exitProcess
 
 class AuthenticationMenu(
     private val authenticationController: AuthenticationController,
-    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(AuthenticationMenuOption::class.java)
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(AuthenticationMenuOption::class.java),
+    private val requestStrategy: RequestOptionStrategy<AuthenticationMenuOption> = ConsoleRequestOptionStrategy(
+        AuthenticationMenuOption::class.java
+    ),
 ) : ResponsiveMenu<AccountEntity> {
     private var currentAccount: AccountEntity? = null
     private var isActive = true
@@ -35,7 +38,7 @@ class AuthenticationMenu(
             //println("Current account: ${if (currentAccount == null) "not logged in" else currentAccount?.name}")
             println("Choose one of the following options.")
             displayMenu()
-            when (getOption()) {
+            when (requestStrategy.requestOption()) {
                 AuthenticationMenuOption.RegisterVisitor -> registerVisitor()
                 AuthenticationMenuOption.RegisterAdmin -> registerAdmin()
                 AuthenticationMenuOption.LoginVisitor -> loginVisitor()
@@ -51,25 +54,6 @@ class AuthenticationMenu(
         } while (isActive)
     }
 
-    private fun parseAction(userInput: String): AuthenticationMenuOption? {
-        try {
-            val optionNumber = userInput.toInt()
-            return when (optionNumber) {
-                1 -> AuthenticationMenuOption.RegisterVisitor
-                2 -> AuthenticationMenuOption.RegisterAdmin
-                3 -> AuthenticationMenuOption.LoginVisitor
-                4 -> AuthenticationMenuOption.LoginAdmin
-                5 -> AuthenticationMenuOption.AuthorizeWithCode
-                6 -> AuthenticationMenuOption.Exit
-                else -> run {
-                    println("Incorrect action chosen...")
-                    null
-                }
-            }
-        } catch (ex: Exception) {
-            return null
-        }
-    }
 
     private fun registerAdmin() {
         val response = authenticationController.registerAdminAccount(queryingAccount = currentAccount)
@@ -120,10 +104,5 @@ class AuthenticationMenu(
             //println("Logged in as administrator: ${response.second?.name}")
         }
         //println("The provided security code does not match the security code of the superuser. Could not log into an account.")
-    }
-
-
-    private fun getOption(): AuthenticationMenuOption? {
-        return readlnOrNull()?.let { parseAction(it) }
     }
 }

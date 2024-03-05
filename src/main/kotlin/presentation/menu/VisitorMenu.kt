@@ -5,7 +5,8 @@ import presentation.menu.options.VisitorMenuOption
 class VisitorMenu(
     private val reviewMenu: ReviewMenu,
     private val orderMenu: OrderMenu,
-    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(VisitorMenuOption::class.java)
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(VisitorMenuOption::class.java),
+    private val requestStrategy: RequestOptionStrategy<VisitorMenuOption> = ConsoleRequestOptionStrategy(VisitorMenuOption::class.java),
 ) : Menu {
     override fun displayMenu() = displayStrategy.display()
 
@@ -14,7 +15,7 @@ class VisitorMenu(
         do {
             println("Choose one of the following options.")
             displayMenu()
-            when (getOption()) {
+            when (requestStrategy.requestOption()) {
                 VisitorMenuOption.OpenOrderMenu -> orderMenu.handleInteractions()
                 VisitorMenuOption.OpenReviewMenu -> reviewMenu.handleInteractions()
                 VisitorMenuOption.LogOut -> {
@@ -28,20 +29,4 @@ class VisitorMenu(
         } while (isActive)
     }
 
-    private fun getOption(): VisitorMenuOption? {
-        return readlnOrNull()?.let { parseAction(it) }
-    }
-
-    private fun parseAction(userInput: String): VisitorMenuOption? {
-        try {
-            val optionNumber = userInput.toInt() - 1
-            if (optionNumber >= VisitorMenuOption.entries.size || optionNumber < 0) {
-                println("Incorrect action chosen...")
-                return null
-            }
-            return VisitorMenuOption.entries[optionNumber]
-        } catch (ex: Exception) {
-            return null
-        }
-    }
 }

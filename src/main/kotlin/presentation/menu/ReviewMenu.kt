@@ -13,7 +13,8 @@ class ReviewMenu(
     private val reviewController: ReviewController,
     private val orderDao: OrderDao,
     private val account: AccountEntity,
-    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(ReviewMenuOption::class.java)
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(ReviewMenuOption::class.java),
+    private val requestStrategy: RequestOptionStrategy<ReviewMenuOption> = ConsoleRequestOptionStrategy(ReviewMenuOption::class.java),
 ) : Menu {
     override fun displayMenu() = displayStrategy.display()
 
@@ -22,7 +23,7 @@ class ReviewMenu(
         do {
             println("Choose one of the following options.")
             displayMenu()
-            when (getOption()) {
+            when (requestStrategy.requestOption()) {
                 ReviewMenuOption.ShowReviews -> showReviews()
                 ReviewMenuOption.LeaveReview -> leaveReview()
                 ReviewMenuOption.UpdateReview -> updateReview()
@@ -35,23 +36,6 @@ class ReviewMenu(
                 null -> {}
             }
         } while (isActive)
-    }
-
-    private fun getOption(): ReviewMenuOption? {
-        return readlnOrNull()?.let { parseAction(it) }
-    }
-
-    private fun parseAction(userInput: String): ReviewMenuOption? {
-        try {
-            val optionNumber = userInput.toInt() - 1
-            if (optionNumber >= ReviewMenuOption.entries.size || optionNumber < 0) {
-                println("Incorrect action chosen...")
-                return null
-            }
-            return ReviewMenuOption.entries[optionNumber]
-        } catch (ex: Exception) {
-            return null
-        }
     }
 
     private fun deleteReview() {
