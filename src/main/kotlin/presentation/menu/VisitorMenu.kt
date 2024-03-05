@@ -5,15 +5,9 @@ import presentation.menu.options.VisitorMenuOption
 class VisitorMenu(
     private val reviewMenu: ReviewMenu,
     private val orderMenu: OrderMenu,
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(VisitorMenuOption::class.java)
 ) : Menu {
-    override fun displayMenu() {
-        println("Options:")
-        println(
-            VisitorMenuOption.entries
-                .mapIndexed { index, entry -> "\t${index + 1}. $entry" }
-                .joinToString(separator = "\n")
-        )
-    }
+    override fun displayMenu() = displayStrategy.display()
 
     override fun handleInteractions() {
         var isActive = true

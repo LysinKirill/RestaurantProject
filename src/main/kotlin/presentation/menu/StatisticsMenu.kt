@@ -3,14 +3,10 @@ package presentation.menu
 import domain.controllers.StatisticsController
 import presentation.menu.options.StatisticsMenuOption
 
-class StatisticsMenu(private val statisticsController: StatisticsController) : Menu {
-    override fun displayMenu() {
-        println(
-            StatisticsMenuOption.entries
-                .mapIndexed { index, entry -> "\t${index + 1}. $entry" }
-                .joinToString(separator = "\n")
-        )
-    }
+class StatisticsMenu(
+    private val statisticsController: StatisticsController,
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(StatisticsMenuOption::class.java)) : Menu {
+    override fun displayMenu() = displayStrategy.display()
 
     override fun handleInteractions() {
         var isActive = true

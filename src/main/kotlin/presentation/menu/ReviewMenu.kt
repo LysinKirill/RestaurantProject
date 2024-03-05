@@ -12,15 +12,10 @@ import presentation.model.Status
 class ReviewMenu(
     private val reviewController: ReviewController,
     private val orderDao: OrderDao,
-    private val account: AccountEntity
+    private val account: AccountEntity,
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(ReviewMenuOption::class.java)
 ) : Menu {
-    override fun displayMenu() {
-        println(
-            ReviewMenuOption.entries
-                .mapIndexed { index, entry -> "\t${index + 1}. $entry" }
-                .joinToString(separator = "\n")
-        )
-    }
+    override fun displayMenu() = displayStrategy.display()
 
     override fun handleInteractions() {
         var isActive = true

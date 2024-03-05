@@ -11,8 +11,8 @@ class AdminMenu(
     private val menuController: RestaurantMenuController,
     private val authenticationController: AuthenticationController,
     private val statisticsMenu: Menu,
-    //private val statisticsController: StatisticsController,
-    private val userAccount: AccountEntity
+    private val userAccount: AccountEntity,
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(AdminMenuOption::class.java),
 ) : Menu {
     init {
         if (userAccount.accountType != AccountType.Administrator)
@@ -21,13 +21,7 @@ class AdminMenu(
             throw Exception("Account ${userAccount.name} has no access right to view this menu.")
     }
 
-    override fun displayMenu() {
-        println(
-            AdminMenuOption.entries
-                .mapIndexed { index, entry -> "\t${index + 1}. $entry" }
-                .joinToString(separator = "\n")
-        )
-    }
+    override fun displayMenu() = displayStrategy.display()
 
     override fun handleInteractions() {
         var isActive = true

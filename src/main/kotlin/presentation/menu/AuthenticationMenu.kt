@@ -1,29 +1,33 @@
 package presentation.menu
 
-import domain.controllers.AuthenticationController
 import data.entity.AccountEntity
+import domain.controllers.AuthenticationController
 import presentation.menu.options.AuthenticationMenuOption
 import presentation.model.Status
 import kotlin.system.exitProcess
 
-class AuthenticationMenu(private val authenticationController: AuthenticationController) :
-    ResponsiveMenu<AccountEntity> {
+class AuthenticationMenu(
+    private val authenticationController: AuthenticationController,
+    private val displayStrategy: DisplayStrategy = DefaultDisplayStrategy(AuthenticationMenuOption::class.java)
+) : ResponsiveMenu<AccountEntity> {
     private var currentAccount: AccountEntity? = null
     private var isActive = true
 
     override fun getResponse(): AccountEntity? = currentAccount
 
-    override fun displayMenu() {
-        println(
-            "Account options:" +
-                    "\n\t1. Register as a new visitor" +
-                    "\n\t2. Register as a new administrator" +
-                    "\n\t3. Log into an account (visitor)" +
-                    "\n\t4. Log into an account (administrator)" +
-                    "\n\t5. Authorize with the security code" +
-                    "\n\t6. Exit"
-        )
-    }
+//    override fun displayMenu() {
+//        println(
+//            "Account options:" +
+//                    "\n\t1. Register as a new visitor" +
+//                    "\n\t2. Register as a new administrator" +
+//                    "\n\t3. Log into an account (visitor)" +
+//                    "\n\t4. Log into an account (administrator)" +
+//                    "\n\t5. Authorize with the security code" +
+//                    "\n\t6. Exit"
+//        )
+//    }
+
+    override fun displayMenu() = displayStrategy.display()
 
     override fun handleInteractions() {
         isActive = true
@@ -41,6 +45,7 @@ class AuthenticationMenu(private val authenticationController: AuthenticationCon
                     println("Exiting...")
                     exitProcess(0)
                 }
+
                 null -> {}
             }
         } while (isActive)
@@ -116,7 +121,6 @@ class AuthenticationMenu(private val authenticationController: AuthenticationCon
         }
         //println("The provided security code does not match the security code of the superuser. Could not log into an account.")
     }
-
 
 
     private fun getOption(): AuthenticationMenuOption? {
