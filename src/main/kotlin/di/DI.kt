@@ -17,6 +17,8 @@ object DI {
     private const val STATISTICS_STORAGE_PATH = "src/main/resources/statistics_storage.json"
     private const val REVIEW_STORAGE_PATH = "src/main/resources/review_storage.json"
 
+    private const val SIMULTANEOUS_ORDERS_LIMIT = 5
+
     const val SUPERUSER_CODE: String = "SuperUser1337"
     private val authenticator: KeyValueAuthenticator<String, String>
         get() = HashAuthenticator(accountDao, hashFunction)
@@ -42,7 +44,7 @@ object DI {
     }
 
     val orderSystem: OrderProcessingSystem by lazy {
-        MultiThreadedOrderSystem(menuDao, orderDao, paymentService, inputManager)
+        MultiThreadedOrderSystem(menuDao, orderDao, paymentService, inputManager, orderScheduler, SIMULTANEOUS_ORDERS_LIMIT)
     }
 
 
@@ -57,6 +59,10 @@ object DI {
             return sb.toString()
         }
         { str -> hashFunc(str) }
+    }
+
+    private val orderScheduler: OrderScheduler by lazy {
+        ThreadSafeQueueOrderScheduler()
     }
 
     private val paymentService: PaymentService by lazy {

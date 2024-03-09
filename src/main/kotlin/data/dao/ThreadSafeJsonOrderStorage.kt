@@ -15,7 +15,11 @@ class ThreadSafeJsonOrderStorage(private val jsonOrderStoragePath: String) : Ord
 
     private val lock = Any()
 
-    override fun addOrder(visitorAccountName: String, finishTime: LocalDateTime, dishes: List<DishEntity>): OrderEntity {
+    override fun addOrder(
+        visitorAccountName: String,
+        finishTime: LocalDateTime,
+        dishes: List<DishEntity>
+    ): OrderEntity {
         synchronized(lock) {
             val storedOrders = readOrdersFromJsonFile().toMutableList()
             val newId = if (storedOrders.isEmpty()) 1 else storedOrders.maxOf { order -> order.id } + 1

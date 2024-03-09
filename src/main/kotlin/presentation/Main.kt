@@ -7,21 +7,23 @@ import presentation.menu.MenuFactory
 fun main() {
     try {
         val menuFactory = MenuFactory()
-        val authenticationMenu = menuFactory.getAuthenticationMenu()
-        authenticationMenu.handleInteractions()
-        val account = authenticationMenu.getResponse()
 
-        if(account == null)
-        {
-            println("Exiting...")
-            return
+        while (true) {
+            val authenticationMenu = menuFactory.getAuthenticationMenu()
+            authenticationMenu.handleInteractions()
+            val account = authenticationMenu.getResponse()
+
+            if (account == null) {
+                println("Exiting...")
+                DI.orderSystem.clearOrders()
+                return
+            }
+
+            val menu = menuFactory.getMenuForUser(account)
+            menu.handleInteractions()
         }
-
-        val menu = menuFactory.getMenuForUser(account)
-        menu.handleInteractions()
-
-        DI.orderSystem.clearOrders()
     } catch (ex: Exception) {
         println("Unexpected exception has occurred: ${ex.message}")
+        throw ex
     }
 }

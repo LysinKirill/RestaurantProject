@@ -10,24 +10,32 @@ import domain.services.PaymentService
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlin.concurrent.thread
+import kotlin.math.max
 
 class MultiThreadedOrderSystem(
     private val menuDao: MenuDao,
     private val orderDao: OrderDao,
     private val paymentService: PaymentService,
     private val inputManager: InputManager,
+    private val orderScheduler: OrderScheduler,
+    private val maxSimultaneousOrders: Int,
 ) : OrderProcessingSystem {
-    private val orderThreads: MutableMap<Int, Thread> = mutableMapOf<Int, Thread>()
+
+    private val simultaneousOrdersLock = Any()
+    private var currentActiveOrders = 0
+    private val orderThreads: MutableMap<Int, Thread> = mutableMapOf()
 
     init {
         for (order in orderDao.getAllOrders()) {
             when (order.status) {
-                OrderStatus.Created -> executeOrder(order)
+                OrderStatus.Created -> orderScheduler.scheduleOrder(order)
                 OrderStatus.Cooking -> {
                     if (LocalDateTime.now().isAfter(order.finishTime)) {
                         orderDao.updateOrder(order.copy(status = OrderStatus.Ready))
+                        println("Order with ID = ${order.id} is ready and can be paid for!")
                         continue
                     }
+                    ++currentActiveOrders
                     executeOrder(order)
                 }
 
@@ -35,13 +43,20 @@ class MultiThreadedOrderSystem(
                 OrderStatus.PaidFor -> continue
             }
         }
+
+        while (currentActiveOrders < maxSimultaneousOrders) {
+            val orderToExecute = orderScheduler.getOrder() ?: break
+            startNewOrder(orderToExecute)
+//            ++currentActiveOrders
+//            executeOrder(orderToExecute)
+        }
     }
 
 
     override fun getUserOrders(user: AccountEntity): List<OrderEntity> = getUserOrders(user.name)
     override fun showUserOrders(user: AccountEntity) {
         println("Active orders of \"${user.name}\":")
-        showOrders(getUserOrders(user.name))
+        showOrders(getUserOrders(user.name).sortedBy { it.status })
     }
 
     override fun createOrder(user: AccountEntity) {
@@ -109,10 +124,13 @@ class MultiThreadedOrderSystem(
             dishes = order.dishes + menuEntryEntity.dish,
             finishTime = getUpdatedFinishTime(order.finishTime, menuEntryEntity.dish)
         )
-        orderDao.updateOrder(updatedOrder)
-        println("Your order has been updated.")
-        orderThreads[orderId]?.interrupt()
-        executeOrder(updatedOrder)
+
+        synchronized(simultaneousOrdersLock) {
+            orderDao.updateOrder(updatedOrder)
+            println("Your order has been updated.")
+            orderThreads[orderId]?.interrupt()
+            executeOrder(updatedOrder)
+        }
     }
 
     override fun cancelOrder(user: AccountEntity) {
@@ -137,6 +155,12 @@ class MultiThreadedOrderSystem(
             return
         }
         cookingThread.interrupt()
+
+        synchronized(simultaneousOrdersLock) {
+            currentActiveOrders = max(currentActiveOrders - 1, 0)
+        }
+        startNewOrder()
+
         orderThreads.remove(orderId)
         orderDao.removeOrder(orderId)
         println("The order with ID = $orderId has been cancelled.")
@@ -181,10 +205,13 @@ class MultiThreadedOrderSystem(
     }
 
     override fun clearOrders() {
-        for ((orderId, orderThread) in orderThreads) {
-            orderThread.interrupt()
+        val orderIds = orderThreads.keys.toList()
+        for(orderId in orderIds) {
+            orderThreads[orderId]?.interrupt()
             orderThreads.remove(orderId)
         }
+
+        currentActiveOrders = 0
     }
 
     private fun confirmOrder(
@@ -233,13 +260,16 @@ class MultiThreadedOrderSystem(
                 menuDao.updateEntry(updatedEntry)
             }
 
-            executeOrder(response)
+            if (currentActiveOrders < maxSimultaneousOrders) {
+                startNewOrder(response)
+                return
+            }
+            orderScheduler.scheduleOrder(response)
             return
         } while (true)
     }
 
     private fun executeOrder(order: OrderEntity) {
-        //val timeSource = TimeSource.Monotonic
         val cookingThread = thread(start = false) {
             try {
                 orderDao.updateOrder(order.copy(status = OrderStatus.Cooking))
@@ -255,7 +285,13 @@ class MultiThreadedOrderSystem(
                 // cookingStrategy.cook = Thread.sleep()
 
                 orderDao.updateOrder(order.copy(status = OrderStatus.Ready))
+                println("Order with ID = ${order.id} is ready and can be paid for!")
                 orderThreads.remove(order.id)
+                synchronized(simultaneousOrdersLock) {
+                    --currentActiveOrders;
+                }
+
+                startNewOrder()
             } catch (_: InterruptedException) {
                 // Notify something about interruption?
             }
@@ -294,4 +330,18 @@ class MultiThreadedOrderSystem(
             }
         )
     )
+
+
+    private fun startNewOrder(order: OrderEntity) {
+        val updatedOrder = order.copy(finishTime = calculateFinishTime(order.dishes))
+        orderDao.updateOrder(updatedOrder)
+        synchronized(simultaneousOrdersLock) {
+            ++currentActiveOrders
+            executeOrder(updatedOrder)
+//            if(currentActiveOrders > maxSimultaneousOrders)
+//                throw LimitExceededException("Limit of simultaneous orders exceeded.")
+        }
+    }
+
+    private fun startNewOrder() = orderScheduler.getOrder()?.let { startNewOrder(it) }
 }
