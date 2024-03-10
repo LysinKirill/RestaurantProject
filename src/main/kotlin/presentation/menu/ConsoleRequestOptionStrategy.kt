@@ -1,5 +1,7 @@
 package presentation.menu
 
+import presentation.menu.interfaces.RequestOptionStrategy
+
 
 class ConsoleRequestOptionStrategy<T : Enum<T>>(
     private val enumClass: Class<T>,

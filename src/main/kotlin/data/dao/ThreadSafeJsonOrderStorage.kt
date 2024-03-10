@@ -13,6 +13,7 @@ import java.time.LocalDateTime
 
 class ThreadSafeJsonOrderStorage(private val jsonOrderStoragePath: String) : OrderDao {
 
+    private val json = Json { prettyPrint = true }
     private val lock = Any()
 
     override fun addOrder(
@@ -55,7 +56,7 @@ class ThreadSafeJsonOrderStorage(private val jsonOrderStoragePath: String) : Ord
         synchronized(lock) {
             val storageFileText = readFileOrCreateEmpty(jsonOrderStoragePath)
             return if (storageFileText.isBlank())
-                listOf() else Json.decodeFromString<List<OrderEntity>>(storageFileText)
+                listOf() else json.decodeFromString<List<OrderEntity>>(storageFileText)
         }
     }
 
@@ -74,11 +75,11 @@ class ThreadSafeJsonOrderStorage(private val jsonOrderStoragePath: String) : Ord
     private fun readOrdersFromJsonFile(): List<OrderEntity> {
         val storageFileText = readFileOrCreateEmpty(jsonOrderStoragePath)
         return if (storageFileText.isBlank())
-            listOf() else Json.decodeFromString<List<OrderEntity>>(storageFileText)
+            listOf() else json.decodeFromString<List<OrderEntity>>(storageFileText)
     }
 
     private fun writeOrdersToFile(orders: List<OrderEntity>) {
-        val serializedOrders = Json.encodeToString(orders)
+        val serializedOrders = json.encodeToString(orders)
         writeTextToFile(jsonOrderStoragePath, serializedOrders)
     }
 

@@ -1,4 +1,4 @@
-package domain.controllers
+package domain.controllers.interfaces
 
 import presentation.model.OutputModel
 

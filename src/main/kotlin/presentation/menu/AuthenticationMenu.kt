@@ -1,7 +1,10 @@
 package presentation.menu
 
 import data.entity.AccountEntity
-import domain.controllers.AuthenticationController
+import domain.controllers.interfaces.AuthenticationController
+import presentation.menu.interfaces.DisplayStrategy
+import presentation.menu.interfaces.RequestOptionStrategy
+import presentation.menu.interfaces.ResponsiveMenu
 import presentation.menu.options.AuthenticationMenuOption
 import presentation.model.Status
 import kotlin.system.exitProcess
@@ -18,24 +21,11 @@ class AuthenticationMenu(
 
     override fun getResponse(): AccountEntity? = currentAccount
 
-//    override fun displayMenu() {
-//        println(
-//            "Account options:" +
-//                    "\n\t1. Register as a new visitor" +
-//                    "\n\t2. Register as a new administrator" +
-//                    "\n\t3. Log into an account (visitor)" +
-//                    "\n\t4. Log into an account (administrator)" +
-//                    "\n\t5. Authorize with the security code" +
-//                    "\n\t6. Exit"
-//        )
-//    }
-
     override fun displayMenu() = displayStrategy.display()
 
     override fun handleInteractions() {
         isActive = true
         do {
-            //println("Current account: ${if (currentAccount == null) "not logged in" else currentAccount?.name}")
             println("Choose one of the following options.")
             displayMenu()
             when (requestStrategy.requestOption()) {
@@ -91,7 +81,6 @@ class AuthenticationMenu(
         if (response.first.status == Status.Success && response.second != null) {
             currentAccount = response.second
             isActive = false
-            //println("Logged in as administrator: ${response.second?.name}")
         }
     }
 
@@ -101,8 +90,6 @@ class AuthenticationMenu(
         if (response.first.status == Status.Success && response.second != null) {
             currentAccount = response.second
             isActive = false
-            //println("Logged in as administrator: ${response.second?.name}")
         }
-        //println("The provided security code does not match the security code of the superuser. Could not log into an account.")
     }
 }

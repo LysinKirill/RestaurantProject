@@ -9,6 +9,7 @@ import java.io.FileNotFoundException
 
 class JsonMenuStorage(private val jsonMenuStoragePath: String) : MenuDao {
 
+    private val json = Json { prettyPrint = true }
     override fun getEntryByDishName(name: String): MenuEntryEntity? {
         val storedEntries: List<MenuEntryEntity> = getAllEntries()
         return storedEntries.find { entry -> entry.dish.name == name }
@@ -21,7 +22,7 @@ class JsonMenuStorage(private val jsonMenuStoragePath: String) : MenuDao {
         
         val updatedEntries = storedEntries.toMutableList()
         updatedEntries.add(menuEntry)
-        val serializedUpdatedStorage = Json.encodeToString(updatedEntries.toList())
+        val serializedUpdatedStorage = json.encodeToString(updatedEntries.toList())
         writeTextToFile(jsonMenuStoragePath, serializedUpdatedStorage)
     }
 
@@ -29,7 +30,7 @@ class JsonMenuStorage(private val jsonMenuStoragePath: String) : MenuDao {
         val storageFileText = readFileOrCreateEmpty(jsonMenuStoragePath)
 
         return if (storageFileText.isBlank())
-            listOf() else Json.decodeFromString<List<MenuEntryEntity>>(storageFileText)
+            listOf() else json.decodeFromString<List<MenuEntryEntity>>(storageFileText)
     }
 
     override fun removeEntry(dishName: String) {
@@ -37,7 +38,7 @@ class JsonMenuStorage(private val jsonMenuStoragePath: String) : MenuDao {
         val updatedEntries = storedEntities.toMutableList()
 
         updatedEntries.removeIf { oldEntry -> oldEntry.dish.name == dishName }
-        val serializedUpdatedStorage = Json.encodeToString(updatedEntries.toList())
+        val serializedUpdatedStorage = json.encodeToString(updatedEntries.toList())
         writeTextToFile(jsonMenuStoragePath, serializedUpdatedStorage)
     }
 
@@ -50,7 +51,7 @@ class JsonMenuStorage(private val jsonMenuStoragePath: String) : MenuDao {
         updatedEntries.removeIf { oldEntry -> oldEntry.dish.name == updatedEntry.dish.name }
         updatedEntries.add(updatedEntry)
 
-        val serializedUpdatedStorage = Json.encodeToString(updatedEntries.toList())
+        val serializedUpdatedStorage = json.encodeToString(updatedEntries.toList())
         writeTextToFile(jsonMenuStoragePath, serializedUpdatedStorage)
     }
 

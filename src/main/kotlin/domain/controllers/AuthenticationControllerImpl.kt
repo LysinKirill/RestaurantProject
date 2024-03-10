@@ -1,17 +1,18 @@
 package domain.controllers
 
 import data.dao.interfaces.AccountDao
-import domain.KeyValueAuthenticator
+import domain.KeyValueVerifier
 import data.entity.AccountEntity
 import data.entity.AccountType
 import di.DI
 import domain.InputManager
+import domain.controllers.interfaces.AuthenticationController
 import presentation.model.OutputModel
 import presentation.model.Status
 
 class AuthenticationControllerImpl(
     private val accountDao: AccountDao,
-    private val authenticator: KeyValueAuthenticator<String, String>,
+    private val authenticator: KeyValueVerifier<String, String>,
     private val inputManager: InputManager,
     private val hashFunction: (String) -> String,
 ) : AuthenticationController {

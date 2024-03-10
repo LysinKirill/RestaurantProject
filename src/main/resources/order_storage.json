@@ -1,1 +1,255 @@
-[{"id":1,"visitorAccountName":"Visitor","finishTime":"2024-03-02T03:59:35.202979","dishes":[{"name":"Juice","price":50.0,"cookingTimeInSeconds":10},{"name":"Juice","price":50.0,"cookingTimeInSeconds":10},{"name":"Fries","price":89.99,"cookingTimeInSeconds":15}],"status":"PaidFor"},{"id":4,"visitorAccountName":"Visitor","finishTime":"2024-03-02T04:18:04.6533297","dishes":[{"name":"Fries","price":89.99,"cookingTimeInSeconds":15}],"status":"Ready"},{"id":3,"visitorAccountName":"Visitor","finishTime":"2024-03-02T04:18:13.9395404","dishes":[{"name":"Fries","price":89.99,"cookingTimeInSeconds":15},{"name":"Pizza","price":650.0,"cookingTimeInSeconds":50}],"status":"Ready"},{"id":2,"visitorAccountName":"Visitor","finishTime":"2024-03-02T04:05:47.8428385","dishes":[{"name":"Pizza","price":650.0,"cookingTimeInSeconds":50},{"name":"Juice","price":50.0,"cookingTimeInSeconds":10}],"status":"PaidFor"}]
+[
+    {
+        "id": 1,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-02T03:59:35.202979",
+        "dishes": [
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            },
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            },
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            }
+        ],
+        "status": "PaidFor"
+    },
+    {
+        "id": 4,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-02T04:18:04.6533297",
+        "dishes": [
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 3,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-02T04:18:13.9395404",
+        "dishes": [
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            },
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 2,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-02T04:05:47.8428385",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            },
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            }
+        ],
+        "status": "PaidFor"
+    },
+    {
+        "id": 5,
+        "visitorAccountName": "Ivan",
+        "finishTime": "2024-03-10T07:20:47.6592541",
+        "dishes": [
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            },
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            },
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            }
+        ],
+        "status": "PaidFor"
+    },
+    {
+        "id": 7,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:38:20.1075579",
+        "dishes": [
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 6,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:38:20.4076186",
+        "dishes": [
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 9,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:41:39.4173748",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            },
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 10,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:41:44.1419728",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 11,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:41:49.1040444",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 12,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:41:53.8017148",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 14,
+        "visitorAccountName": "Ivan",
+        "finishTime": "2024-03-10T07:44:28.8859567",
+        "dishes": [
+            {
+                "name": "Fries",
+                "price": 89.99,
+                "cookingTimeInSeconds": 15
+            },
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            }
+        ],
+        "status": "PaidFor"
+    },
+    {
+        "id": 15,
+        "visitorAccountName": "Ivan",
+        "finishTime": "2024-03-10T07:45:50.2107189",
+        "dishes": [
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            },
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "Ready"
+    },
+    {
+        "id": 8,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:41:31.32859",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "PaidFor"
+    },
+    {
+        "id": 13,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T07:42:21.340049",
+        "dishes": [
+            {
+                "name": "Pizza",
+                "price": 650.0,
+                "cookingTimeInSeconds": 50
+            }
+        ],
+        "status": "PaidFor"
+    },
+    {
+        "id": 16,
+        "visitorAccountName": "Visitor",
+        "finishTime": "2024-03-10T08:40:55.2654949",
+        "dishes": [
+            {
+                "name": "Juice",
+                "price": 50.0,
+                "cookingTimeInSeconds": 10
+            }
+        ],
+        "status": "Ready"
+    }
+]

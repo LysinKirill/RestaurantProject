@@ -1,5 +1,8 @@
 package presentation.menu
 
+import presentation.menu.interfaces.DisplayStrategy
+import presentation.menu.interfaces.Menu
+import presentation.menu.interfaces.RequestOptionStrategy
 import presentation.menu.options.VisitorMenuOption
 
 class VisitorMenu(
@@ -28,5 +31,4 @@ class VisitorMenu(
 
         } while (isActive)
     }
-
 }

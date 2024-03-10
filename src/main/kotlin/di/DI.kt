@@ -6,8 +6,11 @@ import domain.*
 import data.entity.AccountEntity
 import data.entity.AccountType
 import domain.controllers.*
-import domain.services.PaymentService
-import domain.services.PaymentServiceImpl
+import domain.controllers.interfaces.AuthenticationController
+import domain.controllers.interfaces.RestaurantMenuController
+import domain.controllers.interfaces.ReviewController
+import domain.controllers.interfaces.StatisticsController
+import domain.services.*
 import java.security.MessageDigest
 
 object DI {
@@ -20,8 +23,8 @@ object DI {
     private const val SIMULTANEOUS_ORDERS_LIMIT = 5
 
     const val SUPERUSER_CODE: String = "SuperUser1337"
-    private val authenticator: KeyValueAuthenticator<String, String>
-        get() = HashAuthenticator(accountDao, hashFunction)
+    private val authenticator: KeyValueVerifier<String, String>
+        get() = HashVerifier(accountDao, hashFunction)
 
     val inputManager: InputManager
         get() = ConsoleInputManager()

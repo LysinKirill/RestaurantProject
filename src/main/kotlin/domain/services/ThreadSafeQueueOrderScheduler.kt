@@ -1,4 +1,4 @@
-package domain
+package domain.services
 
 import data.entity.OrderEntity
 import data.entity.OrderStatus
@@ -13,7 +13,7 @@ class ThreadSafeQueueOrderScheduler : OrderScheduler {
                 orderQueue.add(orderEntity)
 
                 //DELETE
-                println("Order (id = ${orderEntity.id}) scheduled.")
+                //println("Order (id = ${orderEntity.id}) scheduled.")
             }
         }
     }
@@ -24,7 +24,8 @@ class ThreadSafeQueueOrderScheduler : OrderScheduler {
                 return null
 
             //DELETE
-            println("Order (id = ${orderQueue.peek().id}) removed from queue.")
+            //println("Order (id = ${orderQueue.peek().id}) removed from queue.")
+
             return orderQueue.remove()
         }
     }

@@ -1,4 +1,4 @@
-package domain
+package domain.services
 
 import data.dao.interfaces.MenuDao
 import data.dao.interfaces.OrderDao
@@ -6,9 +6,10 @@ import data.entity.AccountEntity
 import data.entity.DishEntity
 import data.entity.OrderEntity
 import data.entity.OrderStatus
-import domain.services.PaymentService
+import domain.CookingStrategy
+import domain.InputManager
+import domain.SleepCookingStrategy
 import java.time.LocalDateTime
-import java.time.ZoneOffset
 import kotlin.concurrent.thread
 import kotlin.math.max
 
@@ -19,6 +20,7 @@ class MultiThreadedOrderSystem(
     private val inputManager: InputManager,
     private val orderScheduler: OrderScheduler,
     private val maxSimultaneousOrders: Int,
+    private val cookingStrategy: CookingStrategy = SleepCookingStrategy(),
 ) : OrderProcessingSystem {
 
     private val simultaneousOrdersLock = Any()
@@ -47,8 +49,6 @@ class MultiThreadedOrderSystem(
         while (currentActiveOrders < maxSimultaneousOrders) {
             val orderToExecute = orderScheduler.getOrder() ?: break
             startNewOrder(orderToExecute)
-//            ++currentActiveOrders
-//            executeOrder(orderToExecute)
         }
     }
 
@@ -156,14 +156,14 @@ class MultiThreadedOrderSystem(
         }
         cookingThread.interrupt()
 
+        orderThreads.remove(orderId)
+        orderDao.removeOrder(orderId)
+        println("The order with ID = $orderId has been cancelled.")
+
         synchronized(simultaneousOrdersLock) {
             currentActiveOrders = max(currentActiveOrders - 1, 0)
         }
         startNewOrder()
-
-        orderThreads.remove(orderId)
-        orderDao.removeOrder(orderId)
-        println("The order with ID = $orderId has been cancelled.")
     }
 
     override fun payForOrder(user: AccountEntity) {
@@ -200,7 +200,6 @@ class MultiThreadedOrderSystem(
         }
 
         orderDao.updateOrder(order.copy(status = OrderStatus.PaidFor))
-        //orderDao.removeOrder(orderId)
         println("Payment received.")
     }
 
@@ -231,7 +230,7 @@ class MultiThreadedOrderSystem(
                 postfix = "\n"
             ) { dish -> "${dish.name}\tprice: ${dish.price}" }
         )
-        println("Total: ${dishList.sumOf { it.price }}")
+        println( "Total: %.2f".format(dishList.sumOf { it.price }))
 
         do {
             inputManager.showPrompt("Confirm order? [Yes]/[No]")
@@ -273,22 +272,14 @@ class MultiThreadedOrderSystem(
         val cookingThread = thread(start = false) {
             try {
                 orderDao.updateOrder(order.copy(status = OrderStatus.Cooking))
-                val startTimeInstant = LocalDateTime.now().toInstant(ZoneOffset.UTC)
-                val finishTimeInstant = order.finishTime.toInstant(ZoneOffset.UTC)
-                val cookingTime: java.time.Duration = java.time.Duration.between(startTimeInstant, finishTimeInstant)
-                    ?: return@thread
 
-                // Cooking order
-                Thread.sleep(cookingTime.toMillis())
-
-                // Introduce cooking strategy
-                // cookingStrategy.cook = Thread.sleep()
+                cookingStrategy.cookOrder(order)
 
                 orderDao.updateOrder(order.copy(status = OrderStatus.Ready))
                 println("Order with ID = ${order.id} is ready and can be paid for!")
                 orderThreads.remove(order.id)
                 synchronized(simultaneousOrdersLock) {
-                    --currentActiveOrders;
+                    --currentActiveOrders
                 }
 
                 startNewOrder()
@@ -338,8 +329,6 @@ class MultiThreadedOrderSystem(
         synchronized(simultaneousOrdersLock) {
             ++currentActiveOrders
             executeOrder(updatedOrder)
-//            if(currentActiveOrders > maxSimultaneousOrders)
-//                throw LimitExceededException("Limit of simultaneous orders exceeded.")
         }
     }
 

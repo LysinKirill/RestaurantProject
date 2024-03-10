@@ -10,15 +10,16 @@ import java.io.FileNotFoundException
 class JsonRestaurantStatisticsStorage(
     private val jsonRestaurantStatisticsPath: String
 ) : RestaurantStatisticsDao {
+    private val json = Json { prettyPrint = true }
     override fun getStatistics() : RestaurantStatisticsEntity {
         val storageFileText = readFileOrCreateEmpty(jsonRestaurantStatisticsPath)
         if(storageFileText.isBlank())
             return RestaurantStatisticsEntity(0.0)
-        return Json.decodeFromString<RestaurantStatisticsEntity>(storageFileText)
+        return json.decodeFromString<RestaurantStatisticsEntity>(storageFileText)
     }
 
     override fun saveStatistics(statistics: RestaurantStatisticsEntity) {
-        val serializedStatistics = Json.encodeToString(statistics)
+        val serializedStatistics = json.encodeToString(statistics)
         writeTextToFile(jsonRestaurantStatisticsPath, serializedStatistics)
     }
 

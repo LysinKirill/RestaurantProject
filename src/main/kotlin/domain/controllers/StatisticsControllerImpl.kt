@@ -4,6 +4,7 @@ import data.dao.interfaces.OrderDao
 import data.dao.interfaces.RestaurantStatisticsDao
 import data.dao.interfaces.ReviewDao
 import domain.InputManager
+import domain.controllers.interfaces.StatisticsController
 import presentation.model.OutputModel
 import presentation.model.Status
 import java.time.LocalDateTime

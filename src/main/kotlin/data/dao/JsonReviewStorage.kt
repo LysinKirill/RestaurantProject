@@ -11,6 +11,7 @@ import java.time.LocalDateTime
 class JsonReviewStorage(
     private val jsonReviewStoragePath: String
 ) : ReviewDao {
+    private val json = Json { prettyPrint = true }
     override fun addReview(
         accountName: String,
         dishName: String,
@@ -30,20 +31,20 @@ class JsonReviewStorage(
             timeStamp = timeStamp,
         )
         storedReviews.add(newReview)
-        writeTextToFile(jsonReviewStoragePath, Json.encodeToString(storedReviews.toList()))
+        writeTextToFile(jsonReviewStoragePath, json.encodeToString(storedReviews.toList()))
     }
 
     override fun getReview(reviewId: Long) = getAllReviews().find { it.id == reviewId }
 
     override fun removeReview(reviewId: Long) = writeTextToFile(
         filePath = jsonReviewStoragePath,
-        text = Json.encodeToString(getAllReviews().filterNot { it.id == reviewId })
+        text = json.encodeToString(getAllReviews().filterNot { it.id == reviewId })
     )
 
     override fun getAllReviews(): List<ReviewEntity> {
         val storageFileText = readFileOrCreateEmpty(jsonReviewStoragePath)
         return if (storageFileText.isBlank())
-            listOf() else Json.decodeFromString<List<ReviewEntity>>(storageFileText)
+            listOf() else json.decodeFromString<List<ReviewEntity>>(storageFileText)
     }
 
     override fun updateReview(updatedReview: ReviewEntity) {
@@ -53,7 +54,7 @@ class JsonReviewStorage(
             return
         }
         storedReviews.add(updatedReview)
-        writeTextToFile(jsonReviewStoragePath, Json.encodeToString(storedReviews.toList()))
+        writeTextToFile(jsonReviewStoragePath, json.encodeToString(storedReviews.toList()))
     }
 
     private fun readFileOrCreateEmpty(filePath: String): String {

@@ -4,7 +4,10 @@ import data.dao.interfaces.OrderDao
 import data.entity.AccountEntity
 import data.entity.DishEntity
 import data.entity.OrderStatus
-import domain.controllers.ReviewController
+import domain.controllers.interfaces.ReviewController
+import presentation.menu.interfaces.DisplayStrategy
+import presentation.menu.interfaces.Menu
+import presentation.menu.interfaces.RequestOptionStrategy
 import presentation.menu.options.ReviewMenuOption
 import presentation.model.Status
 
@@ -24,7 +27,7 @@ class ReviewMenu(
             println("Choose one of the following options.")
             displayMenu()
             when (requestStrategy.requestOption()) {
-                ReviewMenuOption.ShowReviews -> showReviews()
+                ReviewMenuOption.ShowReviews -> tryShowReviews()
                 ReviewMenuOption.LeaveReview -> leaveReview()
                 ReviewMenuOption.UpdateReview -> updateReview()
                 ReviewMenuOption.DeleteReview -> deleteReview()
@@ -39,19 +42,19 @@ class ReviewMenu(
     }
 
     private fun deleteReview() {
-        if (showReviews() == Status.Failure)
+        if (tryShowReviews() == Status.Failure)
             return
         println(reviewController.deleteReview(account))
     }
 
 
     private fun updateReview() {
-        if (showReviews() == Status.Failure)
+        if (tryShowReviews() == Status.Failure)
             return
         println(reviewController.editReview(account))
     }
 
-    private fun showReviews(): Status {
+    private fun tryShowReviews(): Status {
         val response = reviewController.getDishReviews(account)
         println(response)
         return response.status

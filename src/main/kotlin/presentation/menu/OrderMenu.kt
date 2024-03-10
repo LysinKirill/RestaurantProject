@@ -1,8 +1,11 @@
 package presentation.menu
 
 import data.entity.AccountEntity
-import domain.OrderProcessingSystem
-import domain.controllers.RestaurantMenuController
+import domain.services.OrderProcessingSystem
+import domain.controllers.interfaces.RestaurantMenuController
+import presentation.menu.interfaces.DisplayStrategy
+import presentation.menu.interfaces.Menu
+import presentation.menu.interfaces.RequestOptionStrategy
 import presentation.menu.options.OrderMenuOption
 import presentation.model.Status
 
@@ -29,6 +32,7 @@ class OrderMenu(
                         println("Unable to create the order.")
                         continue
                     }
+                    println()
                     orderSystem.createOrder(userAccount)
                 }
 

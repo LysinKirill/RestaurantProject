@@ -1,4 +1,4 @@
-package presentation.menu
+package presentation.menu.interfaces
 
 interface DisplayStrategy {
     fun display()

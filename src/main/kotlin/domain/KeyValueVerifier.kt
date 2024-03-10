@@ -1,5 +1,5 @@
 package domain
 
-interface KeyValueAuthenticator<KeyType, ValueType> {
+interface KeyValueVerifier<KeyType, ValueType> {
     fun verify(key: KeyType, value: ValueType) : Boolean
 }

@@ -5,6 +5,7 @@ import data.dao.interfaces.ReviewDao
 import data.entity.AccountEntity
 import data.entity.OrderStatus
 import domain.InputManager
+import domain.controllers.interfaces.ReviewController
 import presentation.model.OutputModel
 import presentation.model.Status
 import java.time.LocalDateTime
@@ -55,6 +56,7 @@ class ReviewControllerImpl(
         return OutputModel("Your review has been recorded. Thank you for the feedback!")
     }
 
+
     override fun editReview(account: AccountEntity): OutputModel {
         inputManager.showPrompt("Enter the ID of the review to be changed: ")
         val reviewId = inputManager.getInt()
@@ -76,24 +78,25 @@ class ReviewControllerImpl(
     override fun deleteReview(account: AccountEntity): OutputModel {
         inputManager.showPrompt("Enter the ID of the review to be deleted: ")
         val reviewId = inputManager.getInt()
+
         val review = reviewDao.getReview(reviewId.toLong())
-        if (review == null || review.accountName != account.name)
-            return OutputModel(
-                status = Status.Failure,
-                message = "No record of review with ID = $reviewId for account \"${account.name}\" found."
-            )
+        if (review == null || review.accountName != account.name) return OutputModel(
+            status = Status.Failure,
+            message = "No record of review with ID = $reviewId for account \"${account.name}\" found."
+        )
+
         reviewDao.removeReview(reviewId.toLong())
         return OutputModel("Review with ID = $reviewId has been successfully deleted.")
     }
 
     private fun getReviewDetails(): Triple<Status, Byte, String> {
-        inputManager.showPrompt("Enter your rating for the dish: ")
+        inputManager.showPrompt("Enter your rating for the dish (from 1 to 5): ")
         val rating = inputManager.getInt()
-        if (rating < 1 || rating > 10)
+        if (rating < 1 || rating > 5)
             return Triple(
                 Status.Failure,
                 0,
-                "Rating should be in the range from 1 to 10."
+                "Rating should be in the range from 1 to 5."
             )
 
         inputManager.showPrompt("Enter your review: ")

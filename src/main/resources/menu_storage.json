@@ -1,1 +1,34 @@
-[{"dish":{"name":"Pizza","price":650.0,"cookingTimeInSeconds":50},"remainingNumber":9},{"dish":{"name":"Juice","price":50.0,"cookingTimeInSeconds":10},"remainingNumber":7},{"dish":{"name":"Fries","price":89.99,"cookingTimeInSeconds":15},"remainingNumber":5}]
+[
+    {
+        "dish": {
+            "name": "Pizza",
+            "price": 650.0,
+            "cookingTimeInSeconds": 50
+        },
+        "remainingNumber": 14
+    },
+    {
+        "dish": {
+            "name": "Hamburger",
+            "price": 150.0,
+            "cookingTimeInSeconds": 35
+        },
+        "remainingNumber": 40
+    },
+    {
+        "dish": {
+            "name": "Fries",
+            "price": 89.99,
+            "cookingTimeInSeconds": 20
+        },
+        "remainingNumber": 19
+    },
+    {
+        "dish": {
+            "name": "Juice",
+            "price": 50.0,
+            "cookingTimeInSeconds": 10
+        },
+        "remainingNumber": 17
+    }
+]

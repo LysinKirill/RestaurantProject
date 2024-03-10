@@ -1,6 +1,9 @@
 package presentation.menu
 
-import domain.controllers.StatisticsController
+import domain.controllers.interfaces.StatisticsController
+import presentation.menu.interfaces.DisplayStrategy
+import presentation.menu.interfaces.Menu
+import presentation.menu.interfaces.RequestOptionStrategy
 import presentation.menu.options.StatisticsMenuOption
 
 class StatisticsMenu(
@@ -23,6 +26,7 @@ class StatisticsMenu(
                 StatisticsMenuOption.PopularDishes -> println(statisticsController.getPopularDishes())
                 StatisticsMenuOption.AverageRatingOfDishes -> println(statisticsController.getAverageRatingOfDishes())
                 StatisticsMenuOption.NumberOfOrdersOverPeriod -> println(statisticsController.getOrderCountOverPeriod())
+                StatisticsMenuOption.ShowDishReviews -> println(statisticsController.getDishReviews())
                 StatisticsMenuOption.CloseMenu -> {
                     println("Closing statistics menu...")
                     isActive = false

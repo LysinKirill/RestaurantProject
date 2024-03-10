@@ -1,1 +1,18 @@
-[{"id":1,"accountName":"Visitor","dishName":"Pizza","text":"Great pizza","rating":9,"timeStamp":"2024-03-02T04:44:39.4563622"}]
+[
+    {
+        "id": 1,
+        "accountName": "Visitor",
+        "dishName": "Pizza",
+        "text": "Great pizza",
+        "rating": 9,
+        "timeStamp": "2024-03-02T04:44:39.4563622"
+    },
+    {
+        "id": 2,
+        "accountName": "Ivan",
+        "dishName": "Juice",
+        "text": "The juice is nice",
+        "rating": 7,
+        "timeStamp": "2024-03-10T07:46:27.9984462"
+    }
+]

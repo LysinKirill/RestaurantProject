@@ -5,5 +5,6 @@ enum class StatisticsMenuOption {
     PopularDishes,
     AverageRatingOfDishes,
     NumberOfOrdersOverPeriod,
+    ShowDishReviews,
     CloseMenu,
 }

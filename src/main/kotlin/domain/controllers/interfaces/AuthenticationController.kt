@@ -1,4 +1,4 @@
-package domain.controllers
+package domain.controllers.interfaces
 
 import data.entity.AccountEntity
 import presentation.model.OutputModel

@@ -4,6 +4,7 @@ import data.dao.interfaces.MenuDao
 import data.entity.DishEntity
 import data.entity.MenuEntryEntity
 import domain.InputManager
+import domain.controllers.interfaces.RestaurantMenuController
 import presentation.model.OutputModel
 import presentation.model.Status
 
@@ -112,11 +113,19 @@ class RestaurantMenuControllerImpl(
         val menuEntries = menuDao.getAllEntries()
         if (menuEntries.isEmpty())
             return createFailureResponse("No dishes available.")
+
+        val longestNameLength = menuEntries.maxOf { it.dish.name.length }
+        val longestDishPrice = menuEntries.maxOf { it.dish.price }.toString().length
+        val longestCookingTime = menuEntries.maxOf { it.dish.cookingTimeInSeconds }.toString().length
+
         return OutputModel(
             menuEntries
                 .filter { entry -> entry.remainingNumber > 0 }
                 .joinToString(separator = "\n\t", prefix = "Menu entries:\n\t") { entry ->
-                    "${entry.dish}; Remaining dishes: ${entry.remainingNumber}"
+                    "Name: ${entry.dish.name}".padEnd(longestNameLength + 10) +
+                            "Price: ${entry.dish.price}".padEnd(longestDishPrice + 11) +
+                            "Cooking time ${entry.dish.cookingTimeInSeconds}".padEnd(longestCookingTime + 18) +
+                            "Remaining dishes: ${entry.remainingNumber}"
                 }
         )
     }
