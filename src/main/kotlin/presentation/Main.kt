@@ -24,6 +24,5 @@ fun main() {
         }
     } catch (ex: Exception) {
         println("Unexpected exception has occurred: ${ex.message}")
-        throw ex
     }
 }
